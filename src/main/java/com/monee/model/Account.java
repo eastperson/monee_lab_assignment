@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import javax.management.relation.Role;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class Account {
     private final String nickname;
     private final String password;
     //private Set<Role> roles;
-    private LocalDate createAt;
+    private LocalDateTime createAt;
 
     public Account(String email, String nickname, String password){
         this.email = email;
@@ -32,7 +33,7 @@ public class Account {
         return email;
     }
 
-    public LocalDate getCreateAt(){
+    public LocalDateTime getCreateAt(){
         return this.createAt;
     }
 

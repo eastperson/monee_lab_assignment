@@ -35,102 +35,37 @@
     </div>
     <div class="row justify-content-center" novalidate>
         <div th:replace="fragments.html :: message"></div>
-        <form id="signUpForm" th:action="@{/api/signup}" th:object="${signUpForm}" method="post" class="needs-validation col-sm-8">
+        <form id="signUpForm" action="/api/signup" method="post" class="needs-validation col-sm-8">
             <div class="row mb-3">
                 <label for="inputEmail3" class="col-sm-3 col-form-label">이메일</label>
                 <div class="col-sm-9">
-                    <input type="email" class="form-control" id="inputEmail3" name="email" th:value="*{email}">
+                    <input type="email" class="form-control" id="inputEmail3" name="email" >
                 </div>
                 <small class="invalid-feedback">이메일을 입력하세요.</small>
-                <small class="col-sm-3"></small>
-                <small class="col-sm-9 form-text text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">이메일이 잘못 입력되었습니다.</small>
             </div>
             <div class="row mb-3">
                 <label for="inputNickname" class="col-sm-3 col-form-label">닉네임</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputNickname" name="nickname" minlength="3" maxlength="20" th:value="*{nickname}">
+                    <input type="text" class="form-control" id="inputNickname" name="nickname" minlength="3" maxlength="20">
                 </div>
                 <small class="invalid-feedback">닉네임을 입력하세요.</small>
-                <small class="col-sm-3"></small>
-                <small class="col-sm-9 form-text text-danger" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">닉네임이 잘못 입력되었습니다.</small>
             </div>
             <div class="row mb-3">
                 <label for="inputPassword3" class="col-sm-3 col-form-label">비밀번호</label>
                 <div class="col-sm-9">
-                    <input type="password" class="form-control" id="inputPassword3" name="password" th:value="*{password}">
+                    <input type="password" class="form-control" id="inputPassword3" name="password">
                 </div>
-                <small class="invalid-feedback">비밀번호를 입력하세요.</small>
-                <small class="col-sm-3"></small>
-                <small class="col-sm-9 form-text text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">패스워드가 잘못 입력되었습니다.</small>
-            </div>
-            <div class="row mb-3">
-                <label for="inputPasswordCheck" class="col-sm-3 col-form-label">비밀번호 확인</label>
-                <div class="col-sm-9">
-                    <input type="password" class="form-control" id="inputPasswordCheck" name="passwordCheck" th:value="*{passwordCheck}">
-                </div>
-                <small class="invalid-feedback">비밀번호 확인을 입력하세요.</small>
-                <small class="col-sm-3"></small>
-                <small class="col-sm-9 form-text text-danger" th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}">패스워드 확인이 잘못 입력되었습니다.</small>
-            </div>
-            <div class="row mb-3">
-                <label for="inputPasswordCheck" class="col-sm-3 col-form-label">휴대폰 번호</label>
-                <div class="col-sm-9">
-                    <input type="type" class="form-control" id="inputPhone" name="phone" th:value="*{phone}">
-                </div>
-                <small class="invalid-feedback">비밀번호 확인을 입력하세요.</small>
-                <small class="col-sm-3"></small>
-                <small class="col-sm-9 form-text text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">휴대폰 번호가 잘못 입력되었습니다.</small>
-            </div>
-            <div class="form-check mt-3">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                    <a href="#">이용약관</a>과 <a href="#">개인정보 취급방침</a>에 동의합니다.
-                </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                 <label class="form-check-label" for="flexCheckChecked">
-                    스탁키퍼에서 제공하는 투자정보 수신에 동의합니다.
+                    모니랩에서 제공하는 투자정보 수신에 동의합니다.
                 </label>
             </div>
             <button type="submit" id="submitBtn" class="mt-3 col-sm-12 btn btn-primary">가입하기</button>
         </form>
     </div>
 </div>
-<script>
-    let submitBtn = document.querySelector("#submitBtn");
-    let signUpForm = document.querySelector("#signUpForm");
-
-    submitBtn.addEventListener("click",function (e) {
-        e.preventDefault();
-        let formData = {};
-        let inputData = $("#signUpForm input");
-
-        for (let i = 0; i < inputData.length; i++) {
-
-            formData[inputData[i].name] = inputData[i].value;
-        }
-
-        $.ajax({
-            url: "/api/signup",
-            contentType: "application/json;charset=utf-8",
-            data: JSON.stringify(formData),
-            type: 'POST',
-            dataType: 'json',
-            success: function (result) {
-                alert(result);
-                console.log(result);
-            },
-            error : function (xhr,status,er) {
-                if(error) {
-                    error(er);
-                }
-            }
-        });
-
-    });
-
-</script>
 <script th:replace="fragments.html :: form-validation"></script>
 </body>
 </html>

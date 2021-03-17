@@ -1,6 +1,5 @@
-package com.monee.repository;
+package com.monee.dao;
 
-import com.google.protobuf.Empty;
 import com.monee.model.Account;
 
 import java.awt.print.Pageable;
@@ -18,7 +17,7 @@ import java.util.Optional;
 import static com.monee.utils.DateTimeUtils.dateTimeOf;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class JdbcAccountRepository implements AccountRepository{
+public class AccountDao{
 
     static {
         try {
@@ -36,7 +35,7 @@ public class JdbcAccountRepository implements AccountRepository{
     PreparedStatement pstmt = null;
     ResultSet rs;
 
-    public JdbcAccountRepository(){
+    public AccountDao(){
         try(Connection conn = DriverManager.getConnection(
                 DB_URL,
                 DB_USER,
@@ -48,25 +47,20 @@ public class JdbcAccountRepository implements AccountRepository{
         }
     }
 
-    @Override
-    public Optional<Account> findById(Long seq) throws SQLException {
+    public Optional<Account> findById(Long seq){
 
-        this.conn = DriverManager.getConnection(
-                DB_URL,
-                DB_USER,
-                DB_PASSWORD);
-
-        //String query = "select now();";
         String query = "SELECT * FROM ACCOUNTS WHERE seq =?";
-
-        ResultSet result = null;
 
         Account account = null;
 
-        try {
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);)
+        {
+            this.conn = connection;
+            this.pstmt = preparedStatement;
             System.out.println("find by seq conn : " + this.conn);
+            System.out.println("seq : " + seq);
 
-            pstmt = this.conn.prepareStatement(query);
             pstmt.setLong(1,seq);
             System.out.println("pass");
 
@@ -85,34 +79,20 @@ public class JdbcAccountRepository implements AccountRepository{
             e.printStackTrace();
             return Optional.empty();
 
-        }finally {
-            try {
-                pstmt.close();
-                conn.close();
-            } catch (SQLException e) {
-
-            }
         }
     }
 
-    @Override
-    public List<Account> findAll() throws SQLException {
-
-        this.conn = DriverManager.getConnection(
-                DB_URL,
-                DB_USER,
-                DB_PASSWORD);
+    public List<Account> findAll() {
 
         String query = "SELECT * FROM ACCOUNTS";
 
-        ResultSet result = null;
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);)
+        {
+            this.conn = connection;
+            this.pstmt = preparedStatement;
 
-        Account account = null;
-
-        try {
             System.out.println("find all conn : " + this.conn);
-
-            pstmt = this.conn.prepareStatement(query);
 
             System.out.println("pass");
 
@@ -121,51 +101,34 @@ public class JdbcAccountRepository implements AccountRepository{
             List<Account> list = new ArrayList<>();
 
             while (rs.next()){
-                account = new Account(rs.getString(2),rs.getString(3),rs.getString(4));
+                Account account = new Account(rs.getString(2),rs.getString(3),rs.getString(4));
                 account.setSeq(rs.getLong(1));
                 account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
                 list.add(account);
             }
-
             return list;
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
             return Collections.EMPTY_LIST;
 
-        }finally {
-            try {
-                pstmt.close();
-                conn.close();
-            } catch (SQLException e) {
-
-            }
         }
     }
 
-    @Override
     public List<Account> findAll(Pageable pageable) {
         return null;
     }
 
-    @Override
     public Optional<Account> save(Account account) throws SQLException {
 
-        this.conn = DriverManager.getConnection(
-                DB_URL,
-                DB_USER,
-                DB_PASSWORD);
-
-        //String query = "select now();";
         String query = "INSERT INTO accounts (email,nickname,password) VALUES(?,?,?);";
 
-
-        try {
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);)
+        {
             System.out.println("save conn : " + this.conn);
 
-            pstmt = this.conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            this.pstmt = preparedStatement;
             pstmt.setString(1,account.getEmail());
             pstmt.setString(2,account.getNickname());
             pstmt.setString(3,account.getPassword());
@@ -192,13 +155,34 @@ public class JdbcAccountRepository implements AccountRepository{
             e.printStackTrace();
             return Optional.empty();
 
-        }finally {
-            try {
-                pstmt.close();
-                conn.close();
-            } catch (SQLException e) {
+        }
+    }
 
-            }
+    public int updateNickname(Long seq, String nickname) throws SQLException {
+
+        String query = "UPDATE accounts SET nickname = (?) WHERE seq = (?)";
+
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement= connection.prepareStatement(query);)
+        {
+            System.out.println("save conn : " + this.conn);
+
+            this.pstmt = preparedStatement;
+            pstmt.setString(1,nickname);
+            pstmt.setLong(2,seq);
+
+            System.out.println("pass");
+
+            int result = pstmt.executeUpdate();
+
+            return result;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return -1;
+
         }
     }
 }

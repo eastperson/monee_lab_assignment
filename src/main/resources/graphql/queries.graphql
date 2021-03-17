@@ -1,0 +1,6 @@
+query AccountsQuery($title:String,$content:String){
+    allAccounts(title:$title,content:$content){
+        title
+    }
+
+}

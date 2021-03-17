@@ -36,6 +36,8 @@ public class DatabaseConnector {
 
             System.out.println("current time : "+current);
 
+            System.out.println("JDBC 테스트 완료");
+
         } catch (Exception e) {
 
             e.printStackTrace();

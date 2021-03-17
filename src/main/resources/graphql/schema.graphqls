@@ -1,0 +1,42 @@
+type Account {
+    seq : ID!
+    email : String
+    nickname : String
+    password : String
+    role : [Role]
+}
+
+type Post {
+        seq : ID!
+        title : String!
+        content : String!
+        authorSeq : Account
+        revwCnt : Int
+        replyList : [Reply!]
+
+}
+
+type Reply {
+    seq : ID!
+    content : String!
+    author : Account
+}
+
+enum Role {
+    USER
+    ADMIN
+}
+
+type Query {
+    Account(seq : ID) : Account
+    allAccounts(title:String,content:String) : [Account!]!
+    post(seq : ID!) : Post
+    allPosts : [Post!]!
+    reply(seq : ID!) : Reply
+    allReplys : [Reply!]!
+}
+
+
+schema {
+    query : Query
+}

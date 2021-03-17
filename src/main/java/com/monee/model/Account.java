@@ -9,11 +9,10 @@ import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-@Setter @ToString
 public class Account {
 
     private Long seq;
@@ -29,15 +28,59 @@ public class Account {
         this.password = password;
     }
 
+    public static enum Role {
+        USER, ADMIN
+    }
+
+    public Long getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Long seq) {
+        this.seq = seq;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    public LocalDateTime getCreateAt(){
-        return this.createAt;
+    public String getNickname() {
+        return nickname;
     }
 
-    public static enum Role {
-        USER, ADMIN
+    public String getPassword() {
+        return password;
+    }
+
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return seq.equals(account.seq);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seq);
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "seq=" + seq +
+                ", email='" + email + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", createAt=" + createAt +
+                '}';
     }
 }

@@ -1,7 +1,8 @@
-package com.monee.repository;
+package com.monee.dao;
 
 import com.monee.model.Account;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
@@ -9,20 +10,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AccountRepositoryTest {
+public class AccountDaoTest {
 
-    private JdbcAccountRepository jdbcAccountRepository;
+    private AccountDao accountDao;
 
     @DisplayName("시퀀스 찾기 테스트")
     @Test
     void findById() throws SQLException {
 
-        jdbcAccountRepository = new JdbcAccountRepository();
+        accountDao = new AccountDao();
 
-        Optional<Account> result = jdbcAccountRepository.findById(1L);
+        Optional<Account> result = accountDao.findById(1L);
 
         System.out.println(result);
 
@@ -39,9 +41,9 @@ public class AccountRepositoryTest {
     @Test
     void findAll() throws SQLException {
 
-        jdbcAccountRepository = new JdbcAccountRepository();
+        accountDao = new AccountDao();
 
-        List<Account> result = jdbcAccountRepository.findAll();
+        List<Account> result = accountDao.findAll();
 
         System.out.println(result);
 
@@ -51,16 +53,17 @@ public class AccountRepositoryTest {
 
     @DisplayName("계정 만들기 테스트")
     @Test
+    @Order(1)
     void save() throws SQLException {
 
-        jdbcAccountRepository = new JdbcAccountRepository();
+        accountDao = new AccountDao();
 
         String email = UUID.randomUUID().toString().substring(0,20) + "@email.com";
         Account account = new Account(email,"eastperson","123123");
 
         System.out.println("account : "  + account);
 
-        Optional<Account> result = jdbcAccountRepository.save(account);
+        Optional<Account> result = accountDao.save(account);
 
         if(result.isPresent()){
 
@@ -73,6 +76,31 @@ public class AccountRepositoryTest {
             assertTrue(account.getNickname().equals(newAccount.getNickname()));
             assertTrue(account.getPassword().equals(newAccount.getPassword()));
         }
+
+    }
+
+    @DisplayName("닉네임 변경 테스트")
+    @Test
+    void updateNickname() throws SQLException {
+
+        accountDao = new AccountDao();
+
+        Account account = accountDao.findAll().get(0);
+
+        int result = 0;
+
+        if(account != null) {
+            result = accountDao.updateNickname(account.getSeq(),"변경");
+
+        }
+
+        Account updated = accountDao.findById(account.getSeq()).get();
+
+
+        assertTrue(result>0);
+        assertFalse(updated.getNickname().equals(account.getNickname()));
+
+        accountDao.updateNickname(account.getSeq(),account.getNickname());
 
     }
 

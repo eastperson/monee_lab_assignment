@@ -59,6 +59,7 @@ public class ResultApi<t> {
         return "ResultApi{" +
                 "success=" + success +
                 ", status=" + status +
+                ", data=" + data +
                 '}';
     }
 

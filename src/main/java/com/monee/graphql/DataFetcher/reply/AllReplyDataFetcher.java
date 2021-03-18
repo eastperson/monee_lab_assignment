@@ -7,12 +7,15 @@ import com.monee.service.ReplyService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class AllReplyDataFetcher implements DataFetcher<ResultApi<List<Reply>>> {
 
     private ReplyService replyService;
+    private static Logger log = LoggerFactory.getLogger(AllReplyDataFetcher.class);
 
     public AllReplyDataFetcher(ReplyService replyService){
         this.replyService = replyService;
@@ -37,7 +40,7 @@ public class AllReplyDataFetcher implements DataFetcher<ResultApi<List<Reply>>> 
             return result;
         }
 
-        System.out.println("=======================all reply");
+        log.info("=======================all reply");
         result.setStatus(ResultApi.statusCode.OK);
         result.setSuccess(true);
         result.setData(replyService.findAll());

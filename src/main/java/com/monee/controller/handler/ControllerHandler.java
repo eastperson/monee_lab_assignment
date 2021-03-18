@@ -1,8 +1,11 @@
 package com.monee.controller.handler;
 
+import com.monee.pool.ObjectPool;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,16 +33,19 @@ import static java.util.stream.Collectors.toList;
 public class ControllerHandler implements HttpHandler {
 
     private String root = "C:\\Users\\kjuio\\IdeaProjects\\monee_lab_assignment\\src\\main\\resources\\templates";
-
+    private static Logger log = LoggerFactory.getLogger(ControllerHandler.class);
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+
+        ObjectPool pool = ObjectPool.getInstance();
+
         String requestMethod = exchange.getRequestMethod();
         Headers headers = exchange.getRequestHeaders();
 
         if (requestMethod.equalsIgnoreCase("GET")){
 
-            System.out.println("===============================");
+            log.info("===============================");
 
             Headers responseHeaders = exchange.getResponseHeaders();
 
@@ -47,18 +53,18 @@ public class ControllerHandler implements HttpHandler {
 
             URI uri = exchange.getRequestURI();
 
-            System.out.println("uri path : " + uri.getPath());
-            System.out.println("uri == / " + uri.getPath().equals("/"));
+            log.info("uri path : " + uri.getPath());
+            log.info("uri == / " + uri.getPath().equals("/"));
 
             Map<String, List<String>> params = splitQuery(exchange.getRequestURI().getRawQuery());
 
-            System.out.println("params : "+ params);
+            log.info("params : "+ params);
 
             String noNameText = "Anonymous";
 
             String name = params.getOrDefault("name", List.of(noNameText)).stream().findFirst().orElse(noNameText);
 
-            System.out.println("name : " + name);
+            log.info("name : " + name);
 
             String respText = String.format("Hello %s!", name);
 
@@ -71,7 +77,7 @@ public class ControllerHandler implements HttpHandler {
 
             if(uri.getPath().equals("/")){
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(root + "/index.html"),"UTF-8"));
-                System.out.println("return index.html");
+                log.info("return index.html");
             } else {
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(root + uri.getPath()),"UTF-8"));
             }

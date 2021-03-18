@@ -3,6 +3,8 @@ package com.monee.service;
 import com.monee.dao.AccountDao;
 import com.monee.dto.AccountDto;
 import com.monee.model.Account;
+import javassist.NotFoundException;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -19,9 +21,19 @@ public class AccountService {
         this.accountDao = accountDao;
     }
 
+    public Boolean login(String email, String password) throws NotFoundException {
+        Account account = findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Could not found user for " + email));
+        return BCrypt.checkpw(password,account.getPassword());
+    }
+
+    public Optional<Account> findByEmail(String email) {
+        return accountDao.findByEmail(email);
+    }
+
 
     public Account signup(AccountDto accountDto) throws SQLException {
-        Account account = new Account(accountDto.getEmail(),accountDto.getNickname(),accountDto.getPassword());
+        Account account = new Account(accountDto.getEmail(),accountDto.getNickname(),BCrypt.hashpw(accountDto.getPassword(),BCrypt.gensalt()));
 
         System.out.println("account service singup : " + account);
         try{

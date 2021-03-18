@@ -1,18 +1,22 @@
 package com.monee.graphql.DataFetcher.account;
 
 import com.monee.dao.AccountDao;
+import com.monee.dao.ReplyDao;
 import com.monee.dto.AccountDto;
 import com.monee.model.Account;
 import com.monee.service.AccountService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class CreateAccountDataFetcher implements DataFetcher<ResultApi<Account>> {
 
     private final AccountService accountService;
+    private static Logger log = LoggerFactory.getLogger(CreateAccountDataFetcher.class);
 
     public CreateAccountDataFetcher(AccountService accountService){
         this.accountService = accountService;
@@ -21,26 +25,26 @@ public class CreateAccountDataFetcher implements DataFetcher<ResultApi<Account>>
     @Override
     public ResultApi<Account> get(DataFetchingEnvironment environment) throws Exception {
 
-        System.out.println("create account data fetcher");
+        log.info("create account data fetcher");
 
         String email = environment.getArgument("email");
         String nickname = environment.getArgument("nickname");
         String password = environment.getArgument("password");
 
-        System.out.println("email : "+email);
-        System.out.println("nickname : " + nickname);
-        System.out.println("password : " + password);
+        log.info("email : "+email);
+        log.info("nickname : " + nickname);
+        log.info("password : " + password);
 
         AccountDto accountDto = new AccountDto();
         accountDto.setEmail(email);
         accountDto.setNickname(nickname);
         accountDto.setPassword(password);
 
-        System.out.println("dto : " + accountDto);
+        log.info("dto : " + accountDto);
 
         Account account = accountService.signup(accountDto);
 
-        System.out.println("account : " + account);
+        log.info("account : " + account);
 
         ResultApi<Account> result = new ResultApi<>();
 

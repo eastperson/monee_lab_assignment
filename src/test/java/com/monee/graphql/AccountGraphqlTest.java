@@ -29,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +39,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AccountGraphqlTest {
+
+    private static Logger log = LoggerFactory.getLogger(AccountGraphqlTest.class);
 
     @DisplayName("AccountServiceGraphQLProvide accounts 테스트")
     @Test
@@ -47,7 +51,7 @@ public class AccountGraphqlTest {
         String query = "{allAccounts{success,status,data{seq,email,nickname,seq}}}";
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -61,10 +65,10 @@ public class AccountGraphqlTest {
         String query = "query{Account(seq:1){success,status,data{seq,email,nickname,password}}}";
         //query = "{allAccounts{email,nickname,seq}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -76,7 +80,7 @@ public class AccountGraphqlTest {
         List<Account> accounts = query.getAccounts();
 
         assertNotNull(accounts);
-        System.out.println(accounts);
+        log.info(accounts.toString());
     }
 
     @DisplayName("Query getAccount 클래스")
@@ -87,7 +91,7 @@ public class AccountGraphqlTest {
         Account account = query.getAccount(1L);
 
         assertNotNull(account);
-        System.out.println(account);
+        log.info(account.toString());
     }
 
     @DisplayName("Mutation createAccount 테스트")
@@ -98,10 +102,10 @@ public class AccountGraphqlTest {
         String query = "mutation {createAccount(email:\""+ UUID.randomUUID().toString().substring(0,10)+"@com.com\",nickname:\"eastperson\",password:\"123123\"){success,status,data{seq,email,nickname,password}}}";
         //query = "mutation{allAccounts{email,nickname,seq}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
     }
 
     @DisplayName("Mutation update nickname")
@@ -112,10 +116,10 @@ public class AccountGraphqlTest {
         String query = "mutation {updateAccount(seq:1,nickname:\"eastperson2\"){success,status,data{seq,nickname,password}}}";
         //query = "mutation{allAccounts{email,nickname,seq}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
     }
 
     private AccountServiceGraphQLProvider getAccountServiceGraphQLProvider() throws IOException {
@@ -159,9 +163,9 @@ public class AccountGraphqlTest {
         String query = "mutation {updateAccount(seq:1,password:\"aaabbbcccc\"){success,status,data{seq,nickname,password}}}";
         //query = "mutation{allAccounts{email,nickname,seq}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
     }
 }

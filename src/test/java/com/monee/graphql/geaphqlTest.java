@@ -14,6 +14,8 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import graphql.schema.idl.SchemaParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class geaphqlTest {
 
+    private static Logger log = LoggerFactory.getLogger(geaphqlTest.class);
 
     @DisplayName("schema 테스트")
     @Test
@@ -31,11 +34,11 @@ public class geaphqlTest {
 
         SchemaParser schemaParser = new SchemaParser();
 
-        System.out.println("schema : " + schema);
+        log.info("schema : " + schema);
 
         TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schema);
 
-        System.out.println("typeDefinitionRegistry : " + typeDefinitionRegistry.getType("Query"));
+        log.info("typeDefinitionRegistry : " + typeDefinitionRegistry.getType("Query"));
 
         RuntimeWiring runtimeWiring = newRuntimeWiring()
                 .type("Query", builder -> builder.dataFetcher("hello",new StaticDataFetcher("world")))
@@ -43,15 +46,15 @@ public class geaphqlTest {
         SchemaGenerator schemaGenerator = new SchemaGenerator();
         GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry,runtimeWiring);
 
-        System.out.println("graphQL schema : "+graphQLSchema.getAllTypesAsList());
+        log.info("graphQL schema : "+graphQLSchema.getAllTypesAsList());
 
         GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
 
-        System.out.println("build : " + build);
+        log.info("build : " + build);
 
         ExecutionResult executionResult = build.execute("{hello}");
 
-        System.out.println(executionResult.getData().toString());
+        log.info(executionResult.getData().toString());
     }
 
     @DisplayName("schma file테스트")
@@ -64,16 +67,16 @@ public class geaphqlTest {
 
         File schemaFile = new File("C:\\Users\\kjuio\\IdeaProjects\\monee_lab_assignment\\src\\main\\resources\\graphql\\" + "schema.graphqls");
 
-        System.out.println("schema : " + schemaFile);
+        log.info("schema : " + schemaFile);
 
         SchemaParser schemaParser = new SchemaParser();
         TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaFile);
 
-        System.out.println("typeDefinitionRegistry account : " + typeDefinitionRegistry.getType("Account"));
-        System.out.println("typeDefinitionRegistry post : " + typeDefinitionRegistry.getType("Post"));
-        System.out.println("typeDefinitionRegistry reply : " + typeDefinitionRegistry.getType("Reply"));
-        System.out.println("typeDefinitionRegistry role : " + typeDefinitionRegistry.getType("Role"));
-        System.out.println("typeDefinitionRegistry query : " + typeDefinitionRegistry.getType("Query"));
+        log.info("typeDefinitionRegistry account : " + typeDefinitionRegistry.getType("Account"));
+        log.info("typeDefinitionRegistry post : " + typeDefinitionRegistry.getType("Post"));
+        log.info("typeDefinitionRegistry reply : " + typeDefinitionRegistry.getType("Reply"));
+        log.info("typeDefinitionRegistry role : " + typeDefinitionRegistry.getType("Role"));
+        log.info("typeDefinitionRegistry query : " + typeDefinitionRegistry.getType("Query"));
 
         RuntimeWiring runtimeWiring = newRuntimeWiring()
                 .type("Query", builder -> builder
@@ -87,7 +90,7 @@ public class geaphqlTest {
 
         ExecutionResult executionResult = build.execute("{allAccounts{success,status,data{seq,email,nickname,seq}}}");
 
-        System.out.println(executionResult.getData().toString());
+        log.info(executionResult.getData().toString());
     }
 
 //    private static GraphQLSchema buildSchema(){

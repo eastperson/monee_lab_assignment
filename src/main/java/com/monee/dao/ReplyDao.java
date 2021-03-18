@@ -2,6 +2,8 @@ package com.monee.dao;
 
 import com.monee.model.Post;
 import com.monee.model.Reply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,6 +39,8 @@ public class ReplyDao {
     PreparedStatement pstmt = null;
     ResultSet rs;
 
+    private static Logger log = LoggerFactory.getLogger(ReplyDao.class);
+    
     private final AccountDao accountDao;
 
     private final PostDao postDao;
@@ -71,7 +75,7 @@ public class ReplyDao {
             System.out.println("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,seq);
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 

@@ -5,10 +5,13 @@ import com.monee.service.PostService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeletePostDataFetcher implements DataFetcher<ResultApi> {
 
     private final PostService postService;
+    private static Logger log = LoggerFactory.getLogger(DeletePostDataFetcher.class);
 
     public DeletePostDataFetcher(PostService postService){
         this.postService = postService;
@@ -17,7 +20,7 @@ public class DeletePostDataFetcher implements DataFetcher<ResultApi> {
     @Override
     public ResultApi<Post> get(DataFetchingEnvironment environment) throws Exception {
 
-        System.out.println("===================delete");
+        log.info("===================delete");
 
         String seqStr = environment.getArgument("seq");
         Long seq = Long.valueOf(seqStr);

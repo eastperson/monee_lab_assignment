@@ -1,8 +1,11 @@
 package com.monee.dao;
 
 import com.google.protobuf.Empty;
+import com.monee.controller.handler.ControllerHandler;
 import com.monee.model.Account;
 import com.monee.model.Post;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,6 +42,8 @@ public class PostDao {
     PreparedStatement pstmt = null;
     ResultSet rs;
 
+    private static Logger log = LoggerFactory.getLogger(PostDao.class);
+
     public void setAccountDao(AccountDao accountDao) {
         this.accountDao = accountDao;
     }
@@ -56,7 +61,7 @@ public class PostDao {
                 DB_USER,
                 DB_PASSWORD)){
             this.conn = conn;
-            System.out.println("connection 생성 : "+conn);
+            log.info("connection 생성 : "+conn);
         }catch(Exception e) {
             fail(e.getMessage());
         }
@@ -68,7 +73,7 @@ public class PostDao {
                 DB_USER,
                 DB_PASSWORD)){
             this.conn = conn;
-            System.out.println("connection 생성 : "+conn);
+            log.info("connection 생성 : "+conn);
         }catch(Exception e) {
             fail(e.getMessage());
         }
@@ -87,10 +92,10 @@ public class PostDao {
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
+            log.info("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,seq);
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 
@@ -126,10 +131,10 @@ public class PostDao {
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
+            log.info("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,seq);
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 
@@ -163,10 +168,10 @@ public class PostDao {
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
+            log.info("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,seq);
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 
@@ -199,9 +204,9 @@ public class PostDao {
             this.conn = connection;
             this.pstmt = preparedStatement;
 
-            System.out.println("find all conn : " + this.conn);
+            log.info("find all conn : " + this.conn);
 
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 
@@ -231,17 +236,17 @@ public class PostDao {
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setString(1,post.getTitle());
             pstmt.setString(2,post.getContent());
             pstmt.setLong(3,accountSeq);
-            System.out.println("pass");
-            System.out.println("meta data : "+pstmt.getParameterMetaData());
+            log.info("pass");
+            log.info("meta data : "+pstmt.getParameterMetaData());
 
             int result = pstmt.executeUpdate();
-            System.out.println("저장한 개수 " + result);
+            log.info("저장한 개수 " + result);
 
             rs = pstmt.getGeneratedKeys();
 
@@ -249,7 +254,7 @@ public class PostDao {
 
             if(rs.next()){
                 Long key = rs.getLong(1);
-                System.out.println(key);
+                log.info(String.valueOf(key));
                 newPost = findById(key);
             }
 
@@ -270,14 +275,14 @@ public class PostDao {
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setString(1,title);
             pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
             pstmt.setLong(3,seq);
 
-            System.out.println("pass");
+            log.info("pass");
 
             int result = pstmt.executeUpdate();
 
@@ -299,14 +304,14 @@ public class PostDao {
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setString(1,content);
             pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
             pstmt.setLong(3,seq);
 
-            System.out.println("pass");
+            log.info("pass");
 
             int result = pstmt.executeUpdate();
 
@@ -328,12 +333,12 @@ public class PostDao {
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setLong(1,seq);
 
-            System.out.println("pass");
+            log.info("pass");
 
             int result = pstmt.executeUpdate();
 
@@ -355,12 +360,12 @@ public class PostDao {
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setLong(1,seq);
 
-            System.out.println("pass");
+            log.info("pass");
 
             int result = pstmt.executeUpdate();
 
@@ -388,10 +393,10 @@ public class PostDao {
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
+            log.info("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,seq);
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 

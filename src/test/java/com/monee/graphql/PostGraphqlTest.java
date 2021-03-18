@@ -25,11 +25,15 @@ import com.monee.service.ReplyService;
 import graphql.ExecutionResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class PostGraphqlTest {
+
+    private static Logger log = LoggerFactory.getLogger(PostGraphqlTest.class);
 
     @DisplayName("allPosts 테스트")
     @Test
@@ -38,10 +42,10 @@ public class PostGraphqlTest {
 
         String query = "query{allPosts{success,status,data{seq,title,content,revwCnt,author{seq,nickname,email}}}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -86,10 +90,10 @@ public class PostGraphqlTest {
         String query = "query{Post(seq:1){success,status,data{seq,title,content,revwCnt}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -101,10 +105,10 @@ public class PostGraphqlTest {
         String query = "query{Post(seq:1){success,status,data{seq,title,content,revwCnt,author{seq,nickname,email}}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -116,10 +120,10 @@ public class PostGraphqlTest {
         String query = "query{Post(seq:1){success,status,data{seq,title,content,revwCnt,author{nickname},replyList{seq,content,author{seq,nickname,email}}}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -134,10 +138,10 @@ public class PostGraphqlTest {
         String query = "mutation {createPost(title:\"title\",content:\"content\",author_seq : \"1\"){success,status,data{seq,title,content,revwCnt}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -150,10 +154,10 @@ public class PostGraphqlTest {
         //String query = "mutation {createPost(title:\"title\",content:\"content\",author_seq : \"1\"){seq,title,content,revwCnt}}";
 
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -165,10 +169,10 @@ public class PostGraphqlTest {
         String query = "mutation {updatePost(seq:1,content:\"내용 수정\"){success,status,data{seq,title,content}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -180,10 +184,10 @@ public class PostGraphqlTest {
         String query = "mutation {deletePost(seq:7){success,status,data{seq,title,content,revwCnt}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -196,10 +200,10 @@ public class PostGraphqlTest {
         String query = "mutation {addLikePost(account_seq:\"1\",post_seq:\"1\",isAdd:true){success,status}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -212,10 +216,10 @@ public class PostGraphqlTest {
         String query = "mutation {addLikePost(account_seq:\"1\",post_seq:\"1\",isAdd:false){success,status}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -228,10 +232,10 @@ public class PostGraphqlTest {
         String query = "mutation {addLikePost(account_seq:\"1\",post_seq:\"2\"){success,status}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
-        System.out.println(query);
+        log.info(query);
 
         ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-        System.out.println(result.getData().toString());
+        log.info(result.getData().toString());
 
     }
 
@@ -260,10 +264,10 @@ public class PostGraphqlTest {
 //        String query = "query{Post(seq:1){seq,title,content,author,revwCnt}}";
 //        //String query = "query{allPosts{seq,title,content,revwCnt}}";
 //
-//        System.out.println(query);
+//        log.info(query);
 //
 //        ExecutionResult result = accountServiceGraphQLProvider.execute(query);
-//        System.out.println(result.getData().toString());
+//        log.info(result.getData().toString());
 //
 //    }
 }

@@ -4,39 +4,44 @@ import com.monee.Filter.LoginFilter;
 import com.monee.controller.handler.ControllerHandler;
 import com.monee.controller.handler.RestControllerHandler;
 import com.monee.dao.AccountDao;
+import com.monee.pool.ObjectPool;
 import com.monee.service.AccountService;
 import com.sun.net.httpserver.HttpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 public class CoreApplication {
+    private static Logger log = LoggerFactory.getLogger(CoreApplication.class);
     public static void main(String[] args) throws IOException, NoSuchMethodException {
 
         int serverPort = 8080;
 
         HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
 
-        AccountDao accountDao = new AccountDao();
-        AccountService accountService = new AccountService(accountDao);
+        ObjectPool pool = ObjectPool.getInstance();
 
-        LoginFilter filter = new LoginFilter();
+        LoginFilter filter = pool.getLoginFilter();
+        ControllerHandler controllerHandler = pool.getControllerHandler();
+        RestControllerHandler restControllerHandler = pool.getRestControllerHandler();
 
-        server.createContext("/", new ControllerHandler());
-        server.createContext("/login", new ControllerHandler());
-        server.createContext("/signup", new ControllerHandler());
-        server.createContext("/filter/test", new ControllerHandler()).getFilters().add(filter);
-        server.createContext("/api/account/login",new RestControllerHandler(accountService));
-        server.createContext("/api/account/signup",new RestControllerHandler(accountService));
-        server.createContext("/api/account/logout",new RestControllerHandler(accountService));
-        server.createContext("/api/account",new RestControllerHandler(accountService));
-        server.createContext("/api/post", new RestControllerHandler(accountService));
-        server.createContext("/api/reply", new RestControllerHandler(accountService));
+        server.createContext("/", controllerHandler);
+        server.createContext("/login", controllerHandler);
+        server.createContext("/signup", controllerHandler);
+        server.createContext("/filter/test", controllerHandler).getFilters().add(filter);
+        server.createContext("/api/account/login",restControllerHandler);
+        server.createContext("/api/account/signup",restControllerHandler);
+        server.createContext("/api/account/logout",restControllerHandler);
+        server.createContext("/api/account",restControllerHandler).getFilters().add(filter);
+        server.createContext("/api/post", restControllerHandler).getFilters().add(filter);
+        server.createContext("/api/reply", restControllerHandler).getFilters().add(filter);
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
 
-        System.out.println("server starting..................");
+        log.info("server starting..................");
 
     }
 }

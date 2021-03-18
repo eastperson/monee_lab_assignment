@@ -1,6 +1,9 @@
 package com.monee.dao;
 
+import com.monee.controller.handler.ControllerHandler;
 import com.monee.model.Account;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.print.Pageable;
 import java.sql.Connection;
@@ -35,13 +38,15 @@ public class AccountDao{
     PreparedStatement pstmt = null;
     ResultSet rs;
 
+    private static Logger log = LoggerFactory.getLogger(AccountDao.class);
+
     public AccountDao(){
         try(Connection conn = DriverManager.getConnection(
                 DB_URL,
                 DB_USER,
                 DB_PASSWORD)){
             this.conn = conn;
-            System.out.println("connection 생성 : "+conn);
+            log.info("connection 생성 : "+conn);
         }catch(Exception e) {
             fail(e.getMessage());
         }
@@ -58,11 +63,11 @@ public class AccountDao{
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
-            System.out.println("seq : " + seq);
+            log.info("find by seq conn : " + this.conn);
+            log.info("seq : " + seq);
 
             pstmt.setLong(1,seq);
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 
@@ -92,9 +97,9 @@ public class AccountDao{
             this.conn = connection;
             this.pstmt = preparedStatement;
 
-            System.out.println("find all conn : " + this.conn);
+            log.info("find all conn : " + this.conn);
 
-            System.out.println("pass");
+            log.info("pass");
 
             rs = pstmt.executeQuery();
 
@@ -126,17 +131,17 @@ public class AccountDao{
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setString(1,account.getEmail());
             pstmt.setString(2,account.getNickname());
             pstmt.setString(3,account.getPassword());
-            System.out.println("pass");
-            System.out.println("meta data : "+pstmt.getParameterMetaData());
+            log.info("pass");
+            log.info("meta data : "+pstmt.getParameterMetaData());
 
             int result = pstmt.executeUpdate();
-            System.out.println("저장한 개수 " + result);
+            log.info("저장한 개수 " + result);
 
             rs = pstmt.getGeneratedKeys();
 
@@ -144,7 +149,7 @@ public class AccountDao{
 
             if(rs.next()){
                 Long key = rs.getLong(1);
-                System.out.println(key);
+                log.info(String.valueOf(key));
                 newAccount = findById(key);
             }
 
@@ -165,13 +170,13 @@ public class AccountDao{
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setString(1,nickname);
             pstmt.setLong(2,seq);
 
-            System.out.println("pass");
+            log.info("pass");
 
             int result = pstmt.executeUpdate();
 
@@ -193,13 +198,13 @@ public class AccountDao{
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("save conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setString(1,password);
             pstmt.setLong(2,seq);
 
-            System.out.println("pass");
+            log.info("pass");
 
             int result = pstmt.executeUpdate();
 
@@ -210,6 +215,40 @@ public class AccountDao{
             e.printStackTrace();
 
             return -1;
+
+        }
+    }
+
+    public Optional<Account> findByEmail(String email) {
+        String query = "SELECT * FROM ACCOUNTS WHERE email =?";
+
+        Account account = null;
+
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);)
+        {
+            this.conn = connection;
+            this.pstmt = preparedStatement;
+            log.info("find by email conn : " + this.conn);
+            log.info("email : " + email);
+
+            pstmt.setString(1,email);
+            log.info("pass");
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()){
+                account = new Account(rs.getString(2),rs.getString(3),rs.getString(4));
+                account.setSeq(rs.getLong(1));
+                account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
+            }
+
+            return Optional.of(account);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return Optional.empty();
 
         }
     }

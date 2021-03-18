@@ -1,10 +1,13 @@
 package com.monee.graphql.DataFetcher.account;
 
 import com.monee.dao.AccountDao;
+import com.monee.dao.ReplyDao;
 import com.monee.model.Account;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -16,16 +19,18 @@ public class AccountDataFetcher implements DataFetcher<ResultApi<Account>> {
         this.accountDao = accountDao;
     }
 
+    private static Logger log = LoggerFactory.getLogger(AccountDataFetcher.class);
+
     @Override
     public ResultApi<Account> get(DataFetchingEnvironment environment) throws Exception {
 
-        System.out.println("account date fetcher===========");
-        System.out.println(environment.getArguments());
+        log.info("account date fetcher===========");
+        log.info(String.valueOf(environment.getArguments()));
 
         String seqStr = environment.getArgument("seq");
         Long seq = Long.valueOf(seqStr);
 
-        System.out.println("account date fetcher===========" + seq);
+        log.info("account date fetcher===========" + seq);
         Optional<Account> findById = accountDao.findById(seq);
         ResultApi<Account> result = new ResultApi<>();
         if(findById.isPresent()){

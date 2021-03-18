@@ -18,6 +18,9 @@ public class ControllerResolver {
 
     public ControllerResolver(){
 
+        // TODO Controller parent 생성해서 다형성 이용한 리졸버 처리
+        // Map은 Iterator 혹은 Stream 사용
+
         pool.put("/", ControllerHandler.class);
         pool.put("/login",ControllerHandler.class);
         pool.put("/signup",ControllerHandler.class);

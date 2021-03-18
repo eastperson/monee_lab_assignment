@@ -6,10 +6,13 @@ import com.monee.service.PostService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CreatePostDataFetcher implements DataFetcher<ResultApi<Post>> {
 
     private final PostService postService;
+    private static Logger log = LoggerFactory.getLogger(CreatePostDataFetcher.class);
 
     public CreatePostDataFetcher(PostService postService) {
         this.postService = postService;
@@ -18,23 +21,23 @@ public class CreatePostDataFetcher implements DataFetcher<ResultApi<Post>> {
     @Override
     public ResultApi<Post> get(DataFetchingEnvironment environment) throws Exception {
 
-        System.out.println("=================================create post");
+        log.info("=================================create post");
 
         String title = environment.getArgument("title");
 
-        System.out.println("=================================create post save");
+        log.info("=================================create post save");
 
         String content = environment.getArgument("content");
 
-        System.out.println("=================================create post save");
+        log.info("=================================create post save");
 
         String authorStr = environment.getArgument("author_seq");
 
-        System.out.println("=================================create post save");
+        log.info("=================================create post save");
 
         Long authorSeq = Long.valueOf(authorStr);
 
-        System.out.println("=================================create post save");
+        log.info("=================================create post save");
 
         Post post = postService.save(title,content,authorSeq);
         ResultApi<Post> result = new ResultApi<>();

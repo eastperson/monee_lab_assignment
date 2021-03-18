@@ -4,6 +4,8 @@ import com.monee.model.Account;
 import com.monee.model.Post;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -19,6 +21,8 @@ public class PostDaoTest {
 
     private PostDao postDao;
 
+    private static Logger log = LoggerFactory.getLogger(PostDaoTest.class);
+
     @DisplayName("시퀀스 찾기 테스트")
     @Test
     void findById() throws SQLException {
@@ -27,11 +31,11 @@ public class PostDaoTest {
 
         Optional<Post> result = postDao.findById(1L);
 
-        System.out.println(result);
+        log.info(result.toString());
 
         if(result.isPresent()){
             Post post = result.get();
-            System.out.println(post);
+            log.info(post.toString());
             assertNotNull(post);
             assertTrue(post.getSeq().equals(1L));
             assertNull(post.getAuthor());
@@ -47,11 +51,11 @@ public class PostDaoTest {
 
         Optional<Post> result = postDao.findByIdWithAccount(1L);
 
-        System.out.println(result);
+        log.info(result.toString());
 
         if(result.isPresent()){
             Post post = result.get();
-            System.out.println(post);
+            log.info(post.toString());
             assertNotNull(post);
             assertTrue(post.getSeq().equals(1L));
             assertNotNull(post.getAuthor());
@@ -67,7 +71,7 @@ public class PostDaoTest {
 
         List<Post> result = postDao.findAll();
 
-        System.out.println(result);
+        log.info(result.toString());
 
         assertNotNull(result);
 
@@ -89,16 +93,16 @@ public class PostDaoTest {
 
         if(result.isPresent()){
             Post newPost = result.get();
-            System.out.println(newPost);
+            log.info(newPost.toString());
             assertTrue(post.getTitle().equals(newPost.getTitle()));
             assertTrue(post.getContent().equals(newPost.getContent()));
             assertTrue(newPost.getRevwCnt().equals(0L));
             assertNull(newPost.getAuthor());
-            System.out.println("new post : "+newPost);
+            log.info("new post : "+newPost);
             Account author = postDao.findByIdWithAccount(newPost.getSeq()).get().getAuthor();
             assertNotNull(author);
             assertTrue(author.getSeq().equals(account.getSeq()));
-            System.out.println("author : "+account);
+            log.info("author : "+account);
         }
 
     }
@@ -108,7 +112,7 @@ public class PostDaoTest {
     void updateTitle() throws SQLException {
         postDao = new PostDao();
         Post post = postDao.findAll().get(0);
-        System.out.println("post : "+post);
+        log.info("post : "+post);
         assertNotNull(post);
         int result = postDao.updateTitle(post.getSeq(), "변경");
         assertTrue(result > 0);
@@ -116,7 +120,7 @@ public class PostDaoTest {
         Optional<Post> rs = postDao.findById(post.getSeq());
         if(rs.isPresent()){
             Post update = rs.get();
-            System.out.println("update : "+update);
+            log.info("update : "+update);
             assertNotNull(update);
             assertTrue(update.getTitle().equals("변경"));
             assertTrue(post.getUpdateAt().isBefore(update.getUpdateAt()));
@@ -129,7 +133,7 @@ public class PostDaoTest {
     void updateContent() throws SQLException {
         postDao = new PostDao();
         Post post = postDao.findAll().get(1);
-        System.out.println("post : "+post);
+        log.info("post : "+post);
         assertNotNull(post);
         int result = postDao.updateContent(post.getSeq(), "변경");
         assertTrue(result > 0);
@@ -137,7 +141,7 @@ public class PostDaoTest {
         Optional<Post> rs = postDao.findById(post.getSeq());
         if(rs.isPresent()){
             Post update = rs.get();
-            System.out.println("update : "+update);
+            log.info("update : "+update);
             assertNotNull(update);
             assertTrue(update.getContent().equals("변경"));
             assertTrue(post.getUpdateAt().isBefore(update.getUpdateAt()));

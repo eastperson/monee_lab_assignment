@@ -1,9 +1,11 @@
 package com.monee.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.monee.security.Jwt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.management.relation.Role;
 import java.time.LocalDate;
@@ -82,5 +84,16 @@ public class Account {
                 ", password='" + password + '\'' +
                 ", createAt=" + createAt +
                 '}';
+    }
+
+    public String newJwt(Jwt jwt) {
+        Jwt.Claims claims = Jwt.Claims.of(this.seq,this);
+        return jwt.create(claims);
+    }
+
+    public void login(String credentials) {
+        if (!BCrypt.checkpw(credentials, password)) {
+            throw new IllegalArgumentException("Bad credential");
+        }
     }
 }

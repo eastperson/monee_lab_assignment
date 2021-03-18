@@ -5,10 +5,13 @@ import com.monee.service.PostService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LikePostDataFetcher implements DataFetcher<ResultApi> {
 
     private final PostService postService;
+    private static Logger log = LoggerFactory.getLogger(LikePostDataFetcher.class);
 
     public LikePostDataFetcher(PostService postService) {
         this.postService = postService;
@@ -17,7 +20,7 @@ public class LikePostDataFetcher implements DataFetcher<ResultApi> {
     @Override
     public ResultApi get(DataFetchingEnvironment environment) throws Exception {
 
-        System.out.println("======================like");
+        log.info("======================like");
 
         String accountSeqStr = environment.getArgument("account_seq");
         String postSeqStr = environment.getArgument("post_seq");
@@ -38,20 +41,20 @@ public class LikePostDataFetcher implements DataFetcher<ResultApi> {
             return result;
         }
 
-        System.out.println("======================like");
 
-        System.out.println("======================like");
+        log.info("======================like");
         if(isAdd){
              rs = postService.addLike(accountSeq,postSeq);
-            System.out.println("======================like");
+            log.info("======================like rs : " + rs);
         }else {
             rs = postService.cancleLike(accountSeq,postSeq);
-            System.out.println("======================like");
+            log.info("======================like rs : " + rs);
         }
 
         if(rs) {
             result.setStatus(ResultApi.statusCode.OK);
             result.setSuccess(true);
+            return result;
         }
         result.setStatus(ResultApi.statusCode.BAD_REQUEST);
         result.setSuccess(false);

@@ -6,10 +6,13 @@ import com.monee.service.ReplyService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReplyDataFetcher implements DataFetcher<ResultApi<Reply>> {
 
     private final ReplyService replyService;
+    private static Logger log = LoggerFactory.getLogger(ReplyDataFetcher.class);
 
     public ReplyDataFetcher(ReplyService replyService) {
         this.replyService = replyService;
@@ -21,7 +24,7 @@ public class ReplyDataFetcher implements DataFetcher<ResultApi<Reply>> {
         Long seq = Long.valueOf(seqStr);
 
         Reply reply = replyService.findByIdWithAccount(seq);
-        System.out.println(reply);
+        log.info(String.valueOf(reply));
 
         ResultApi<Reply> result = new ResultApi<>();
         if(reply != null){

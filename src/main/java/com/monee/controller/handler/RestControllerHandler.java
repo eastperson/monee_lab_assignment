@@ -6,6 +6,7 @@ import com.monee.dao.LikeDao;
 import com.monee.dao.PostDao;
 import com.monee.dao.ReplyDao;
 import com.monee.dto.AccountDto;
+import com.monee.dto.LoginResult;
 import com.monee.graphql.AccountServiceGraphQLProvider;
 import com.monee.graphql.DataFetcher.account.AccountDataFetcher;
 import com.monee.graphql.DataFetcher.account.AllAccountDataFetcher;
@@ -23,14 +24,20 @@ import com.monee.graphql.DataFetcher.reply.DeleteReplyDataFetcher;
 import com.monee.graphql.DataFetcher.reply.ReplyDataFetcher;
 import com.monee.graphql.DataFetcher.reply.UpdateReplyDataFetcher;
 import com.monee.model.Account;
+import com.monee.pool.ObjectPool;
+import com.monee.security.Jwt;
 import com.monee.service.AccountService;
 import com.monee.service.PostService;
 import com.monee.service.ReplyService;
+import com.monee.utils.ResultApi;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import graphql.ExecutionResult;
 import lombok.SneakyThrows;
+import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -58,61 +65,36 @@ import static java.util.stream.Collectors.toList;
 public class RestControllerHandler implements HttpHandler  {
 
     private AccountService accountService;
-
-    public RestControllerHandler(){
-
-    }
-    public RestControllerHandler(AccountService accountService){
-        this.accountService = accountService;
-    }
+    private static Logger log = LoggerFactory.getLogger(ControllerHandler.class);
+    private Jwt jwt;
 
     @SneakyThrows
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        System.out.println("handle======================");
+        ObjectPool pool = ObjectPool.getInstance();
 
-        AccountDao accountDao = new AccountDao();
-        AccountDataFetcher accountDataFetcher = new AccountDataFetcher(accountDao);
-        AllAccountDataFetcher allAccountDataFetcher = new AllAccountDataFetcher(accountDao);
-        AccountService accountService = new AccountService(accountDao);
-        CreateAccountDataFetcher createAccountDataFetcher = new CreateAccountDataFetcher(accountService);
-        UpdateAccountDataFetcher updateAccountDataFetcher = new UpdateAccountDataFetcher(accountService);
+        log.info("handle======================");
 
-        PostDao postDao = new PostDao();
-        LikeDao likeDao = new LikeDao();
-        PostService postService = new PostService(postDao,likeDao);
-        PostDataFetcher postDataFetcher = new PostDataFetcher(postService);
-        AllPostDataFetcher allPostDataFetcher = new AllPostDataFetcher(postService);
-        CreatePostDataFetcher createPostDataFetcher = new CreatePostDataFetcher(postService);
-        UpdatePostDataFetcher updatePostDataFetcher = new UpdatePostDataFetcher(postService);
-        DeletePostDataFetcher deletePostDataFetcher = new DeletePostDataFetcher(postService);
-        LikePostDataFetcher likePostDataFetcher = new LikePostDataFetcher(postService);
+        accountService = pool.getAccountService();
 
-        ReplyDao replyDao = new ReplyDao(accountDao, postDao);
-        ReplyService replyService = new ReplyService(replyDao);
-        AllReplyDataFetcher allReplyDataFetcher = new AllReplyDataFetcher(replyService);
-        CreateReplyDataFetcher createReplyDataFetcher = new CreateReplyDataFetcher(replyService);
-        DeleteReplyDataFetcher deleteReplyDataFetcher = new DeleteReplyDataFetcher(replyService);
-        ReplyDataFetcher replyDataFetcher = new ReplyDataFetcher(replyService);
-        UpdateReplyDataFetcher updateReplyDataFetcher = new UpdateReplyDataFetcher(replyService);
-
-        AccountServiceGraphQLProvider accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(accountDao, allAccountDataFetcher, accountDataFetcher, createAccountDataFetcher, updateAccountDataFetcher,
-                postDataFetcher, allPostDataFetcher, createPostDataFetcher, updatePostDataFetcher, deletePostDataFetcher
-                , allReplyDataFetcher, createReplyDataFetcher, deleteReplyDataFetcher, replyDataFetcher, updateReplyDataFetcher,likePostDataFetcher);
+        AccountServiceGraphQLProvider accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(pool.getAccountDao(),pool.getAllAccountDataFetcher()
+            ,pool.getAccountDataFetcher(),pool.getCreateAccountDataFetcher(),pool.getUpdateAccountDataFetcher(),pool.getPostDataFetcher(),pool.getAllPostDataFetcher()
+            ,pool.getCreatePostDataFetcher(),pool.getUpdatePostDataFetcher(),pool.getDeletePostDataFetcher(),pool.getAllReplyDataFetcher(),pool.getCreateReplyDataFetcher()
+            ,pool.getDeleteReplyDataFetcher(),pool.getReplyDataFetcher(),pool.getUpdateReplyDataFetcher(),pool.getLikePostDataFetcher());
         accountServiceGraphQLProvider.loadSchema();
 
         Gson gson = new Gson();
 
-        System.out.println("request header : " + exchange.getRequestHeaders().keySet());
-        System.out.println("request header Content-type : " + exchange.getRequestHeaders().get("Content-type"));
-        System.out.println("request method : " + exchange.getRequestMethod());
+        log.info("request header : " + exchange.getRequestHeaders().keySet());
+        log.info("request header Content-type : " + exchange.getRequestHeaders().get("Content-type"));
+        log.info("request method : " + exchange.getRequestMethod());
 
         int status = 200;
 
         if("POST".equals(exchange.getRequestMethod())){
 
-            System.out.println("===============================");
+            log.info("===============================");
 
             Headers responseHeaders = exchange.getResponseHeaders();
 
@@ -120,11 +102,11 @@ public class RestControllerHandler implements HttpHandler  {
 
             URI uri = exchange.getRequestURI();
 
-            System.out.println("uri path : " + uri.getPath());
+            log.info("uri path : " + uri.getPath());
 
             Map<String, List<String>> params = splitQuery(exchange.getRequestURI().getRawQuery());
 
-            System.out.println("params : "+ params);
+            log.info("params : "+ params);
 
             String respText = null;
 
@@ -134,7 +116,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 String name = params.getOrDefault("name", List.of(noNameText)).stream().findFirst().orElse(noNameText);
 
-                System.out.println("name : " + name);
+                log.info("name : " + name);
 
                 respText = format("Hello %s!", name);
             }
@@ -146,7 +128,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    System.out.println("=======================================json reqeust");
+                    log.info("=======================================json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -156,19 +138,19 @@ public class RestControllerHandler implements HttpHandler  {
                             str += br.readLine().trim();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.out.println(e.getMessage());
+                            log.info(e.getMessage());
                             str += "}";
                         }
 
-                        System.out.println(str);
+                        log.info(str);
                     }
 
-                    System.out.println("request body : "+str);
+                    log.info("request body : "+str);
                     Map<String,String> map = gson.fromJson(str,HashMap.class);
                     String query = map.get("query");
 
                     ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
-                    System.out.println("execute : "+execute.getData().toString());
+                    log.info("execute : "+execute.getData().toString());
 
                     //AccountDto dto = gson.fromJson(str, AccountDto.class);
 
@@ -186,7 +168,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    System.out.println("=======================================json reqeust");
+                    log.info("=======================================json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -196,19 +178,19 @@ public class RestControllerHandler implements HttpHandler  {
                             str += br.readLine().trim();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.out.println(e.getMessage());
+                            log.info(e.getMessage());
                             str += "}";
                         }
 
-                        System.out.println(str);
+                        log.info(str);
                     }
 
-                    System.out.println("request body : "+str);
+                    log.info("request body : "+str);
                     Map<String,String> map = gson.fromJson(str,HashMap.class);
                     String query = map.get("query");
 
                     ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
-                    System.out.println("execute : "+execute.getData().toString());
+                    log.info("execute : "+execute.getData().toString());
 
                     //AccountDto dto = gson.fromJson(str, AccountDto.class);
 
@@ -226,7 +208,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    System.out.println("=======================================json reqeust");
+                    log.info("=======================================json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -236,19 +218,19 @@ public class RestControllerHandler implements HttpHandler  {
                             str += br.readLine().trim();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.out.println(e.getMessage());
+                            log.info(e.getMessage());
                             str += "}";
                         }
 
-                        System.out.println(str);
+                        log.info(str);
                     }
 
-                    System.out.println("request body : "+str);
+                    log.info("request body : "+str);
                     Map<String,String> map = gson.fromJson(str,HashMap.class);
                     String query = map.get("query");
 
                     ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
-                    System.out.println("execute : "+execute.getData().toString());
+                    log.info("execute : "+execute.getData().toString());
 
                     //AccountDto dto = gson.fromJson(str, AccountDto.class);
 
@@ -260,11 +242,59 @@ public class RestControllerHandler implements HttpHandler  {
             }
 
             if(uri.getPath().equals("/api/account/login")){
-                // TODO 인증문제
-            }
+                BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
 
-            if(uri.getPath().equals("/api/account/logout")){
-                // TODO 인증문제
+                int b = 0;
+
+                if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
+
+                    log.info("=======================================json reqeust");
+                    log.info("========================api login");
+
+                    String str = "";
+                    str += br.readLine().trim();
+
+                    while((b = br.read()) != -1) {
+                        try {
+                            str += br.readLine().trim();
+                        } catch (Exception e) {
+                            log.info(e.getMessage());
+                            str += "}";
+                        }
+
+                        log.info(str);
+                    }
+
+                    log.info("request body : "+str);
+                    Map<String,String> map = gson.fromJson(str,HashMap.class);
+                    String email = map.get("email");
+                    String password = map.get("password");
+                    ResultApi<LoginResult> result = new ResultApi<>();
+                    result.setSuccess(false);
+                    result.setStatus(ResultApi.statusCode.BAD_REQUEST);
+
+                    log.info("email : "+email);
+                    log.info("password : " + password);
+                    log.info("result : " + result);
+
+                    if(accountService.login(email,password)){
+                        log.info("login success");
+                        Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+                        Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
+                        String accessToken = account.newJwt(jwt);
+                        result.setData(new LoginResult(accessToken,account));
+                        result.setSuccess(true);
+                        result.setStatus(ResultApi.statusCode.OK);
+                        log.info(String.valueOf(result));
+                    }
+
+                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
+
+                    //Account account = accountService.signup(dto);
+
+                    respText = gson.toJson(result.toString());
+
+                }
             }
 
             if(uri.getPath().equals("/api/account/signup")){
@@ -274,7 +304,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    System.out.println("=======================================json reqeust");
+                    log.info("=======================================json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -283,27 +313,47 @@ public class RestControllerHandler implements HttpHandler  {
                         try {
                             str += br.readLine().trim();
                         } catch (Exception e) {
-                            e.printStackTrace();
-                            System.out.println(e.getMessage());
+                            log.info(e.getMessage());
                             str += "}";
                         }
 
-                        System.out.println(str);
+                        log.info(str);
                     }
 
-                    System.out.println("request body : "+str);
+                    log.info("request body : "+str);
 
                     AccountDto dto = gson.fromJson(str, AccountDto.class);
 
                     Account account = accountService.signup(dto);
 
-                    respText = gson.toJson(account);
+                    log.info("account : " + account);
+
+                    String email = dto.getEmail();
+                    String password = dto.getPassword();
+                    ResultApi<LoginResult> result = new ResultApi<>();
+                    result.setSuccess(false);
+                    result.setStatus(ResultApi.statusCode.BAD_REQUEST);
+
+                    log.info("result : " + result);
+
+                    if(accountService.login(email,password)){
+                        log.info("login success");
+                        account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+                        Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
+                        String accessToken = account.newJwt(jwt);
+                        result.setData(new LoginResult(accessToken,account));
+                        result.setSuccess(true);
+                        result.setStatus(ResultApi.statusCode.CREATED);
+                        log.info(String.valueOf(result));
+                    }
+
+                    respText = gson.toJson(result);
 
                 }
 
                 if(exchange.getRequestHeaders().get("Content-type").contains("application/x-www-form-urlencoded")){
 
-                    System.out.println("=======================================form reqeust");
+                    log.info("=======================================form reqeust");
 
                     String str = "";
 
@@ -311,11 +361,11 @@ public class RestControllerHandler implements HttpHandler  {
                             str += br.readLine().trim();
                         } while((b = br.read()) != -1);
 
-                    System.out.println("str : " + str);
+                    log.info("str : " + str);
 
                     Map<String, List<String>> form = splitQuery(str);
 
-                    System.out.println("form data : " + form);
+                    log.info("form data : " + form);
 
                     String email = form.get("email").get(0);
                     String nickname = form.get("nickname").get(0);
@@ -330,15 +380,15 @@ public class RestControllerHandler implements HttpHandler  {
                     dto.setNickname(nickname);
                     dto.setPassword(password);
 
-                    System.out.println("account dto : " + dto);
+                    log.info("account dto : " + dto);
 
                     Account account = accountService.signup(dto);
 
-                    System.out.println(account);
+                    log.info(String.valueOf(account));
 
                     respText = gson.toJson(account);
 
-                    System.out.println("respText : " + respText);
+                    log.info("respText : " + respText);
 
                     String newUrl = "http://localhost:8080/";
 
@@ -351,31 +401,6 @@ public class RestControllerHandler implements HttpHandler  {
                 OutputStreamWriter ow = new OutputStreamWriter(responseBody,"UTF-8");
                 BufferedWriter bw = new BufferedWriter(ow);
 
-            }
-
-            if(uri.getPath().equals("/api/post/new")){
-                // TODO 인증문제
-                // TODO GraphQL
-            }
-            if(uri.getPath().equals("/api/post/update")){
-                // TODO 인증문제
-                // TODO GraphQL
-            }
-            if(uri.getPath().equals("/api/post/delete")){
-                // TODO 인증문제
-                // TODO GraphQL
-            }
-            if(uri.getPath().equals("/api/reply/new")){
-                // TODO 인증문제
-                // TODO GraphQL
-            }
-            if(uri.getPath().equals("/api/reply/update")){
-                // TODO 인증문제
-                // TODO GraphQL
-            }
-            if(uri.getPath().equals("/api/reply/delete")){
-                // TODO 인증문제
-                // TODO GraphQL
             }
 
             exchange.sendResponseHeaders(status, respText.getBytes().length);

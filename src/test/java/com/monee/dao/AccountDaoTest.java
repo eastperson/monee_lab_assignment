@@ -4,6 +4,8 @@ import com.monee.model.Account;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,6 +20,8 @@ public class AccountDaoTest {
 
     private AccountDao accountDao;
 
+    private static Logger log = LoggerFactory.getLogger(AccountDaoTest.class);
+
     @DisplayName("시퀀스 찾기 테스트")
     @Test
     void findById() throws SQLException {
@@ -26,13 +30,32 @@ public class AccountDaoTest {
 
         Optional<Account> result = accountDao.findById(1L);
 
-        System.out.println(result);
+        log.info(result.toString());
 
         if(result.isPresent()){
             Account account = result.get();
-            System.out.println(account);
+            log.info(account.toString());
             assertNotNull(account);
             assertTrue(account.getSeq().equals(1L));
+        }
+
+    }
+
+    @DisplayName("이메일 찾기 테스트")
+    @Test
+    void findByEmail() throws SQLException {
+
+        accountDao = new AccountDao();
+
+        Optional<Account> result = accountDao.findByEmail("kjuioq@gmail.com");
+
+        log.info(result.toString());
+
+        if(result.isPresent()){
+            Account account = result.get();
+            log.info(account.toString());
+            assertNotNull(account);
+            assertTrue(account.getEmail().equals("kjuioq@gmail.com"));
         }
 
     }
@@ -45,7 +68,7 @@ public class AccountDaoTest {
 
         List<Account> result = accountDao.findAll();
 
-        System.out.println(result);
+        log.info(result.toString());
 
         assertNotNull(result);
 
@@ -61,7 +84,7 @@ public class AccountDaoTest {
         String email = UUID.randomUUID().toString().substring(0,20) + "@email.com";
         Account account = new Account(email,"eastperson","123123");
 
-        System.out.println("account : "  + account);
+        log.info("account : "  + account);
 
         Optional<Account> result = accountDao.save(account);
 
@@ -69,7 +92,7 @@ public class AccountDaoTest {
 
             Account newAccount = result.get();
 
-            System.out.println("new account : "+ newAccount);
+            log.info("new account : "+ newAccount);
 
             assertNotNull(newAccount);
             assertTrue(account.getEmail().equals(newAccount.getEmail()));

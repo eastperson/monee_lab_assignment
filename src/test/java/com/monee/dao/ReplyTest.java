@@ -5,6 +5,8 @@ import com.monee.model.Post;
 import com.monee.model.Reply;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReplyTest {
 
     private ReplyDao replyDao;
+    private static Logger log = LoggerFactory.getLogger(ReplyTest.class);
 
     @DisplayName("시퀀스 찾기 테스트")
     @Test
@@ -29,11 +32,11 @@ public class ReplyTest {
 
         Optional<Reply> result = replyDao.findById(1L);
 
-        System.out.println(result);
+        log.info(result.toString());
 
         if(result.isPresent()){
             Reply reply = result.get();
-            System.out.println(reply);
+            log.info(reply.toString());
             assertNotNull(reply);
             assertTrue(reply.getSeq().equals(1L));
             assertNull(reply.getAuthor());
@@ -51,11 +54,11 @@ public class ReplyTest {
 
         Optional<Reply> result = replyDao.findByIdWithAccount(1L);
 
-        System.out.println(result);
+        log.info(result.toString());
 
         if(result.isPresent()){
             Reply reply = result.get();
-            System.out.println(reply);
+            log.info(reply.toString());
             assertNotNull(reply);
             assertTrue(reply.getSeq().equals(1L));
             assertNotNull(reply.getAuthor());
@@ -73,7 +76,7 @@ public class ReplyTest {
 
         List<Reply> result = replyDao.findAll();
 
-        System.out.println(result);
+        log.info(result.toString());
 
         assertNotNull(result);
 
@@ -89,7 +92,7 @@ public class ReplyTest {
 
         List<Reply> result = replyDao.findByPostId(33L);
 
-        System.out.println(result);
+        log.info(result.toString());
 
         assertNotNull(result);
 
@@ -111,26 +114,26 @@ public class ReplyTest {
 
         if(result.isPresent()){
             Post newPost = result.get();
-            System.out.println(newPost);
+            log.info(newPost.toString());
             assertTrue(post.getTitle().equals(newPost.getTitle()));
             assertTrue(post.getContent().equals(newPost.getContent()));
             assertTrue(newPost.getRevwCnt().equals(0L));
             assertNull(newPost.getAuthor());
-            System.out.println("new post : "+newPost);
+            log.info("new post : "+newPost);
             Account author = postDao.findByIdWithAccount(newPost.getSeq()).get().getAuthor();
             assertNotNull(author);
             assertTrue(author.getSeq().equals(account.getSeq()));
-            System.out.println("author : "+author);
+            log.info("author : "+author);
 
             Reply reply = new Reply("댓글 내용");
             Optional<Reply> resultReply = replyDao.save(account.getSeq(),newPost.getSeq(),reply);
             Reply newReply = resultReply.get();
-            System.out.println("new reply : "+newReply);
+            log.info("new reply : "+newReply);
             assertTrue(newReply.getContent().equals("댓글 내용"));
 
 
             Account replyWriter = replyDao.findByIdWithAccount(newReply.getSeq()).get().getAuthor();
-            System.out.println("reply writer : "+replyWriter);
+            log.info("reply writer : "+replyWriter);
             assertNotNull(replyWriter);
             assertTrue(replyWriter.getSeq().equals(account.getSeq()));
 
@@ -145,7 +148,7 @@ public class ReplyTest {
         PostDao postDao = new PostDao();
         ReplyDao replyDao = new ReplyDao(accountDao,postDao);
         Reply reply = replyDao.findAll().get(1);
-        System.out.println("reply : "+reply);
+        log.info("reply : "+reply);
         assertNotNull(reply);
         int result = replyDao.updateContent(reply.getSeq(), "변경");
         assertTrue(result > 0);
@@ -153,7 +156,7 @@ public class ReplyTest {
         Optional<Reply> rs = replyDao.findById(reply.getSeq());
         if(rs.isPresent()){
             Reply update = rs.get();
-            System.out.println("update : "+update);
+            log.info("update : "+update);
             assertNotNull(update);
             assertTrue(update.getContent().equals("변경"));
             assertTrue(reply.getUpdateAt().isBefore(update.getUpdateAt()));
@@ -179,7 +182,7 @@ public class ReplyTest {
         if(rs.isPresent()){
             Reply newReply = replyDao.findById(rs.get().getSeq()).get();
             assertNotNull(newReply);
-            System.out.println(newReply);
+            log.info(newReply.toString());
             int rss = replyDao.delete(newReply.getSeq());
             assertTrue(rss > 0);
             assertFalse(replyDao.findById(newReply.getSeq()).isPresent());

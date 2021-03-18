@@ -6,10 +6,13 @@ import com.monee.service.ReplyService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteReplyDataFetcher implements DataFetcher<ResultApi<Reply>> {
 
     private final ReplyService replyService;
+    private static Logger log = LoggerFactory.getLogger(DeleteReplyDataFetcher.class);
 
     public DeleteReplyDataFetcher(ReplyService replyService) {
         this.replyService = replyService;
@@ -18,7 +21,7 @@ public class DeleteReplyDataFetcher implements DataFetcher<ResultApi<Reply>> {
     @Override
     public ResultApi<Reply> get(DataFetchingEnvironment environment) throws Exception {
 
-        System.out.println("===================delete");
+        log.info("===================delete");
 
         String seqStr = environment.getArgument("seq");
         Long seq = Long.valueOf(seqStr);

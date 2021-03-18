@@ -6,10 +6,13 @@ import com.monee.service.AccountService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdateAccountDataFetcher implements DataFetcher<ResultApi<Account>>{
 
         private final AccountService accountService;
+    private static Logger log = LoggerFactory.getLogger(UpdateAccountDataFetcher.class);
 
         public UpdateAccountDataFetcher(AccountService accountService){
             this.accountService = accountService;
@@ -18,7 +21,7 @@ public class UpdateAccountDataFetcher implements DataFetcher<ResultApi<Account>>
         @Override
         public ResultApi<Account> get(DataFetchingEnvironment environment) throws Exception {
 
-            System.out.println("update account nickname data fetcher");
+            log.info("update account nickname data fetcher");
 
             String seqStr =environment.getArgument("seq");
             Long seq = Long.valueOf(seqStr);
@@ -26,7 +29,7 @@ public class UpdateAccountDataFetcher implements DataFetcher<ResultApi<Account>>
 
             String password = environment.getArgument("password");
 
-            System.out.println("seq : "+seq);
+            log.info("seq : "+seq);
 
             Account account = null;
 
@@ -35,22 +38,24 @@ public class UpdateAccountDataFetcher implements DataFetcher<ResultApi<Account>>
             result.setStatus(404);
 
             if(nickname != null){
-                System.out.println("nickname : " + nickname);
+                log.info("nickname : " + nickname);
                 account = accountService.updateNickname(seq,nickname);
                 result.setSuccess(true);
                 result.setStatus(ResultApi.statusCode.OK);
                 result.setData(account);
+                return  result;
             }
 
             if(password != null) {
-                System.out.println("password : " + password);
+                log.info("password : " + password);
                 account = accountService.updatePassword(seq,password);
                 result.setSuccess(true);
                 result.setStatus(ResultApi.statusCode.OK);
                 result.setData(account);
+                return result;
             }
 
-            System.out.println("account : " + account);
+            log.info("account : " + account);
             result.setData(account);
             result.setSuccess(false);
             result.setStatus(ResultApi.statusCode.NOT_FOUND);

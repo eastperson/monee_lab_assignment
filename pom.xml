@@ -15,14 +15,21 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <java.jwt.version>3.12.0</java.jwt.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>2.11.0</log4j.version>
     </properties>
 
     <dependencies>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
+                <artifactId>jackson-annotations</artifactId>
             <version>2.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+            <version>2.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -76,92 +83,111 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
         </dependency>
-
+        <dependency>
+            <groupId>de.svenkubiak</groupId>
+            <artifactId>jBCrypt</artifactId>
+            <version>0.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.6</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java.jwt.version}</version>
+        </dependency>
     </dependencies>
     <build>
-    <plugins>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId> <!-- 그룹 아이디 -->
-            <artifactId>exec-maven-plugin</artifactId> <!-- 플러그인명 -->
-            <version>1.6.0</version>
-            <executions>
-                <execution>
-                    <id>font-end install</id>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                    <phase>prepare-package</phase>
-                    <configuration>
-                        <executable>npm</executable>
-                        <arguments>
-                            <argument>install</argument>
-                        </arguments>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>font-end unit test</id>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                    <phase>prepare-package</phase>
-                    <configuration>
-                        <executable>npm</executable>
-                        <arguments>
-                            <argument>run</argument>
-                            <argument>test:unit</argument>
-                        </arguments>
-                    </configuration>
-                </execution>
-                <execution> <!-- NPM Build -->
-                    <id>font-end build package</id>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                    <phase>prepare-package</phase>
-                    <configuration>
-                        <executable>npm</executable>
-                        <arguments>
-                            <argument>run</argument>
-                            <argument>build</argument>
-                        </arguments>
-                    </configuration>
-                </execution>
-                <execution> <!-- e2e Test -->
-                    <id>front-end e2e test</id>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                    <phase>integration-test</phase>
-                    <configuration>
-                        <executable>npm</executable>
-                        <arguments>
-                            <argument>run</argument>
-                            <argument>test:integration</argument>
-                        </arguments>
-                    </configuration>
-                </execution>
-            </executions>
-            <configuration>
-                <workingDirectory>${basedir}/static</workingDirectory>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>10</source>
-                <target>10</target>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.6.0</version>
-            <configuration>
-                <mainClass>com.zetcode.JavaSeH2Server</mainClass>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId> <!-- 그룹 아이디 -->
+                <artifactId>exec-maven-plugin</artifactId> <!-- 플러그인명 -->
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>font-end install</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>install</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>font-end unit test</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>test:unit</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution> <!-- NPM Build -->
+                        <id>font-end build package</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>build</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution> <!-- e2e Test -->
+                        <id>front-end e2e test</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>test:integration</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <workingDirectory>${basedir}/static</workingDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <mainClass>com.zetcode.JavaSeH2Server</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

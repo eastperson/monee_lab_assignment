@@ -1,6 +1,9 @@
 package com.monee.dao;
 
+import com.monee.controller.handler.ControllerHandler;
 import com.monee.model.Reply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,6 +32,7 @@ public class LikeDao {
     PreparedStatement pstmt = null;
     ResultSet rs;
 
+    private static Logger log = LoggerFactory.getLogger(LikeDao.class);
 
     public boolean add(Long accountSeq, Long postSeq) {
 
@@ -39,13 +43,14 @@ public class LikeDao {
             {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                System.out.println("find by seq conn : " + this.conn);
+                log.info("find by seq conn : " + this.conn);
 
                 pstmt.setLong(1,accountSeq);
                 pstmt.setLong(2,postSeq);
-                System.out.println("pass");
+                log.info("pass");
 
                 int rs = pstmt.executeUpdate();
+                log.info("rs : " + rs);
 
                 return rs == 1;
 
@@ -65,11 +70,11 @@ public class LikeDao {
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
+            log.info("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,accountSeq);
             pstmt.setLong(2,postSeq);
-            System.out.println("pass");
+            log.info("pass");
 
             int rs = pstmt.executeUpdate();
 
@@ -91,11 +96,11 @@ public class LikeDao {
         {
             this.conn = connection;
             this.pstmt = preparedStatement;
-            System.out.println("find by seq conn : " + this.conn);
+            log.info("find by seq conn : " + this.conn);
 
             pstmt.setLong(1,accountSeq);
             pstmt.setLong(2,postSeq);
-            System.out.println("pass");
+            log.info("pass");
 
             ResultSet rs = pstmt.executeQuery();
 

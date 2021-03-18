@@ -2,12 +2,30 @@ package com.monee.controller.handler;
 
 import com.google.gson.Gson;
 import com.monee.dao.AccountDao;
+import com.monee.dao.LikeDao;
+import com.monee.dao.PostDao;
+import com.monee.dao.ReplyDao;
 import com.monee.dto.AccountDto;
 import com.monee.graphql.AccountServiceGraphQLProvider;
-import com.monee.graphql.DataFetcher.AccountDataFetcher;
-import com.monee.graphql.DataFetcher.AllAccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.AccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.AllAccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.CreateAccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.UpdateAccountDataFetcher;
+import com.monee.graphql.DataFetcher.post.AllPostDataFetcher;
+import com.monee.graphql.DataFetcher.post.CreatePostDataFetcher;
+import com.monee.graphql.DataFetcher.post.DeletePostDataFetcher;
+import com.monee.graphql.DataFetcher.post.LikePostDataFetcher;
+import com.monee.graphql.DataFetcher.post.PostDataFetcher;
+import com.monee.graphql.DataFetcher.post.UpdatePostDataFetcher;
+import com.monee.graphql.DataFetcher.reply.AllReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.CreateReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.DeleteReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.ReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.UpdateReplyDataFetcher;
 import com.monee.model.Account;
 import com.monee.service.AccountService;
+import com.monee.service.PostService;
+import com.monee.service.ReplyService;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -25,6 +43,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +75,33 @@ public class RestControllerHandler implements HttpHandler  {
         AccountDao accountDao = new AccountDao();
         AccountDataFetcher accountDataFetcher = new AccountDataFetcher(accountDao);
         AllAccountDataFetcher allAccountDataFetcher = new AllAccountDataFetcher(accountDao);
-        AccountServiceGraphQLProvider accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(accountDao,accountDataFetcher,allAccountDataFetcher);
+        AccountService accountService = new AccountService(accountDao);
+        CreateAccountDataFetcher createAccountDataFetcher = new CreateAccountDataFetcher(accountService);
+        UpdateAccountDataFetcher updateAccountDataFetcher = new UpdateAccountDataFetcher(accountService);
+
+        PostDao postDao = new PostDao();
+        LikeDao likeDao = new LikeDao();
+        PostService postService = new PostService(postDao,likeDao);
+        PostDataFetcher postDataFetcher = new PostDataFetcher(postService);
+        AllPostDataFetcher allPostDataFetcher = new AllPostDataFetcher(postService);
+        CreatePostDataFetcher createPostDataFetcher = new CreatePostDataFetcher(postService);
+        UpdatePostDataFetcher updatePostDataFetcher = new UpdatePostDataFetcher(postService);
+        DeletePostDataFetcher deletePostDataFetcher = new DeletePostDataFetcher(postService);
+        LikePostDataFetcher likePostDataFetcher = new LikePostDataFetcher(postService);
+
+        ReplyDao replyDao = new ReplyDao(accountDao, postDao);
+        ReplyService replyService = new ReplyService(replyDao);
+        AllReplyDataFetcher allReplyDataFetcher = new AllReplyDataFetcher(replyService);
+        CreateReplyDataFetcher createReplyDataFetcher = new CreateReplyDataFetcher(replyService);
+        DeleteReplyDataFetcher deleteReplyDataFetcher = new DeleteReplyDataFetcher(replyService);
+        ReplyDataFetcher replyDataFetcher = new ReplyDataFetcher(replyService);
+        UpdateReplyDataFetcher updateReplyDataFetcher = new UpdateReplyDataFetcher(replyService);
+
+        AccountServiceGraphQLProvider accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(accountDao, allAccountDataFetcher, accountDataFetcher, createAccountDataFetcher, updateAccountDataFetcher,
+                postDataFetcher, allPostDataFetcher, createPostDataFetcher, updatePostDataFetcher, deletePostDataFetcher
+                , allReplyDataFetcher, createReplyDataFetcher, deleteReplyDataFetcher, replyDataFetcher, updateReplyDataFetcher,likePostDataFetcher);
         accountServiceGraphQLProvider.loadSchema();
+
         Gson gson = new Gson();
 
         System.out.println("request header : " + exchange.getRequestHeaders().keySet());
@@ -95,7 +139,7 @@ public class RestControllerHandler implements HttpHandler  {
                 respText = format("Hello %s!", name);
             }
 
-            if(uri.getPath().equals("/api/account/view")){
+            if(uri.getPath().equals("/api/reply")){
                 BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
 
                 int b = 0;
@@ -113,21 +157,104 @@ public class RestControllerHandler implements HttpHandler  {
                         } catch (Exception e) {
                             e.printStackTrace();
                             System.out.println(e.getMessage());
+                            str += "}";
                         }
 
                         System.out.println(str);
                     }
 
                     System.out.println("request body : "+str);
+                    Map<String,String> map = gson.fromJson(str,HashMap.class);
+                    String query = map.get("query");
 
-                    ExecutionResult execute = accountServiceGraphQLProvider.execute(str);
-                    System.out.println("execute : "+execute);
+                    ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
+                    System.out.println("execute : "+execute.getData().toString());
 
                     //AccountDto dto = gson.fromJson(str, AccountDto.class);
 
                     //Account account = accountService.signup(dto);
 
-                    respText = gson.toJson(execute);
+                    respText = gson.toJson(execute.getData().toString());
+
+                }
+            }
+
+            if(uri.getPath().equals("/api/post")){
+                BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
+
+                int b = 0;
+
+                if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
+
+                    System.out.println("=======================================json reqeust");
+
+                    String str = "";
+                    str += br.readLine().trim();
+
+                    while((b = br.read()) != -1) {
+                        try {
+                            str += br.readLine().trim();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.out.println(e.getMessage());
+                            str += "}";
+                        }
+
+                        System.out.println(str);
+                    }
+
+                    System.out.println("request body : "+str);
+                    Map<String,String> map = gson.fromJson(str,HashMap.class);
+                    String query = map.get("query");
+
+                    ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
+                    System.out.println("execute : "+execute.getData().toString());
+
+                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
+
+                    //Account account = accountService.signup(dto);
+
+                    respText = gson.toJson(execute.getData().toString());
+
+                }
+            }
+
+            if(uri.getPath().equals("/api/account")){
+                BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
+
+                int b = 0;
+
+                if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
+
+                    System.out.println("=======================================json reqeust");
+
+                    String str = "";
+                    str += br.readLine().trim();
+
+                    while((b = br.read()) != -1) {
+                        try {
+                            str += br.readLine().trim();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.out.println(e.getMessage());
+                            str += "}";
+                        }
+
+                        System.out.println(str);
+                    }
+
+                    System.out.println("request body : "+str);
+                    Map<String,String> map = gson.fromJson(str,HashMap.class);
+                    String query = map.get("query");
+
+                    ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
+                    System.out.println("execute : "+execute.getData().toString());
+
+                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
+
+                    //Account account = accountService.signup(dto);
+
+                    respText = gson.toJson(execute.getData().toString());
 
                 }
             }

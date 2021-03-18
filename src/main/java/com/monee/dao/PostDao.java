@@ -114,6 +114,9 @@ public class PostDao {
 
     public Optional<Post> findByIdWithAccount(Long seq) throws SQLException {
 
+        AccountDao accountDao = new AccountDao();
+        setAccountDao(accountDao);
+
         String query = "SELECT * FROM posts WHERE seq =?";
 
         Post post = null;
@@ -149,7 +152,7 @@ public class PostDao {
         }
     }
 
-    public Optional<Post> findByIdWithReolyList(Long seq) throws SQLException {
+    public Optional<Post> findByIdWithReplyList(Long seq) throws SQLException {
 
         String query = "SELECT * FROM posts WHERE seq =?";
 
@@ -184,11 +187,6 @@ public class PostDao {
             return Optional.empty();
 
         }
-    }
-
-    public Optional<Post> findByIdWithReplys(Long seq) throws SQLException {
-
-        return Optional.empty();
     }
 
     public List<Post> findAll() throws SQLException {
@@ -373,8 +371,47 @@ public class PostDao {
             e.printStackTrace();
 
             return -1;
-
         }
     }
 
+    public Optional<Post> findByIdWithAll(Long seq) {
+
+        AccountDao accountDao = new AccountDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,this);
+
+        String query = "SELECT * FROM posts WHERE seq =?";
+
+        Post post = null;
+
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);)
+        {
+            this.conn = connection;
+            this.pstmt = preparedStatement;
+            System.out.println("find by seq conn : " + this.conn);
+
+            pstmt.setLong(1,seq);
+            System.out.println("pass");
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()){
+                post = new Post(rs.getString("title"),rs.getString("content"));
+                post.setSeq(rs.getLong("seq"));
+                post.setRevwCnt(rs.getLong("revw_cnt"));
+                post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
+                post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                post.setReplyList(replyDao.findByPostId(post.getSeq()));
+                post.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
+            }
+
+            return Optional.of(post);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return Optional.empty();
+
+        }
+    }
 }

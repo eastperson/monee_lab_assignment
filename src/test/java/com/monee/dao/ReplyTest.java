@@ -23,7 +23,9 @@ public class ReplyTest {
     @Test
     void findById() throws SQLException {
 
-        replyDao = new ReplyDao();
+        AccountDao accountDao = new AccountDao();
+        PostDao postDao = new PostDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
 
         Optional<Reply> result = replyDao.findById(1L);
 
@@ -43,7 +45,9 @@ public class ReplyTest {
     @Test
     void findByIdWithAccount() throws SQLException {
 
-        replyDao = new ReplyDao();
+        AccountDao accountDao = new AccountDao();
+        PostDao postDao = new PostDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
 
         Optional<Reply> result = replyDao.findByIdWithAccount(1L);
 
@@ -63,7 +67,9 @@ public class ReplyTest {
     @Test
     void findAll() throws SQLException {
 
-        replyDao = new ReplyDao();
+        AccountDao accountDao = new AccountDao();
+        PostDao postDao = new PostDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
 
         List<Reply> result = replyDao.findAll();
 
@@ -77,7 +83,9 @@ public class ReplyTest {
     @Test
     void findByPostId() throws SQLException {
 
-        replyDao = new ReplyDao();
+        AccountDao accountDao = new AccountDao();
+        PostDao postDao = new PostDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
 
         List<Reply> result = replyDao.findByPostId(33L);
 
@@ -94,12 +102,12 @@ public class ReplyTest {
         AccountDao accountDao = new AccountDao();
         Account account = accountDao.findAll().get(0);
         assertNotNull(account);
-        ReplyDao replyDao = new ReplyDao();
+
         PostDao postDao = new PostDao(accountDao,replyDao);
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
         Post post = new Post("타이틀","콘텐츠");
         Optional<Post> result = postDao.save(account.getSeq(),post);
-        replyDao.setPostDao(postDao);
-        replyDao.setAccountDao(accountDao);
+
 
         if(result.isPresent()){
             Post newPost = result.get();
@@ -133,7 +141,9 @@ public class ReplyTest {
     @DisplayName("댓글 내용 수정 테스트")
     @Test
     void updateContent() throws SQLException {
-        replyDao = new ReplyDao();
+        AccountDao accountDao = new AccountDao();
+        PostDao postDao = new PostDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
         Reply reply = replyDao.findAll().get(1);
         System.out.println("reply : "+reply);
         assertNotNull(reply);
@@ -163,7 +173,7 @@ public class ReplyTest {
         Optional<Post> result = postDao.save(account.getSeq(),post);
         Post newPost = result.get();
 
-        replyDao = new ReplyDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
         Reply reply = new Reply("댓글 내용");
         Optional<Reply> rs = replyDao.save(account.getSeq(),newPost.getSeq(),reply);
         if(rs.isPresent()){

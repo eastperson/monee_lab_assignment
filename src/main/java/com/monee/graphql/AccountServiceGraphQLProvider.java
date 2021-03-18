@@ -1,11 +1,21 @@
 package com.monee.graphql;
 
 import com.monee.dao.AccountDao;
-import com.monee.graphql.DataFetcher.AccountDataFetcher;
-import com.monee.graphql.DataFetcher.AllAccountDataFetcher;
-import com.monee.model.Account;
-import com.monee.model.Post;
-import com.monee.service.AccountService;
+import com.monee.graphql.DataFetcher.account.AccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.AllAccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.CreateAccountDataFetcher;
+import com.monee.graphql.DataFetcher.account.UpdateAccountDataFetcher;
+import com.monee.graphql.DataFetcher.post.AllPostDataFetcher;
+import com.monee.graphql.DataFetcher.post.CreatePostDataFetcher;
+import com.monee.graphql.DataFetcher.post.DeletePostDataFetcher;
+import com.monee.graphql.DataFetcher.post.LikePostDataFetcher;
+import com.monee.graphql.DataFetcher.post.PostDataFetcher;
+import com.monee.graphql.DataFetcher.post.UpdatePostDataFetcher;
+import com.monee.graphql.DataFetcher.reply.AllReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.CreateReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.DeleteReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.ReplyDataFetcher;
+import com.monee.graphql.DataFetcher.reply.UpdateReplyDataFetcher;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
@@ -14,16 +24,8 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.sql.SQLException;
-import java.util.stream.Stream;
 
 import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 
@@ -33,20 +35,48 @@ public class AccountServiceGraphQLProvider implements AccountServiceGraphQL {
     private final AccountDao accountDao;
     private final AllAccountDataFetcher allAccountDataFetcher;
     private final AccountDataFetcher accountDataFetcher;
+    private final CreateAccountDataFetcher createAccountDataFetcher;
+    private final UpdateAccountDataFetcher updateAccountDataFetcher;
+    private final PostDataFetcher postDataFetcher;
+    private final AllPostDataFetcher allPostDataFetcher;
+    private final CreatePostDataFetcher createPostDataFetcher;
+    private final UpdatePostDataFetcher updatePostDataFetcher;
+    private final DeletePostDataFetcher deletePostDataFetcher;
+    private final AllReplyDataFetcher allReplyDataFetcher;
+    private final CreateReplyDataFetcher createReplyDataFetcher;
+    private final DeleteReplyDataFetcher deleteReplyDataFetcher;
+    private final ReplyDataFetcher replyDataFetcher;
+    private final UpdateReplyDataFetcher updateReplyDataFetcher;
+    private final LikePostDataFetcher likePostDataFetcher;
     private GraphQL graphQL;
 
-
-    public AccountServiceGraphQLProvider(AccountDao accountDao, AccountDataFetcher accountDataFetcher, AllAccountDataFetcher allAccountDataFetcher){
+    public AccountServiceGraphQLProvider(AccountDao accountDao, AllAccountDataFetcher allAccountDataFetcher, AccountDataFetcher accountDataFetcher, CreateAccountDataFetcher createAccountDataFetcher, UpdateAccountDataFetcher updateAccountDataFetcher, PostDataFetcher postDataFetcher, AllPostDataFetcher allPostDataFetcher, CreatePostDataFetcher createPostDataFetcher, UpdatePostDataFetcher updatePostDataFetcher, DeletePostDataFetcher deletePostDataFetcher, AllReplyDataFetcher allReplyDataFetcher, CreateReplyDataFetcher createReplyDataFetcher, DeleteReplyDataFetcher deleteReplyDataFetcher, ReplyDataFetcher replyDataFetcher, UpdateReplyDataFetcher updateReplyDataFetcher, LikePostDataFetcher likePostDataFetcher) {
         this.accountDao = accountDao;
-        this.accountDataFetcher = accountDataFetcher;
         this.allAccountDataFetcher = allAccountDataFetcher;
+        this.accountDataFetcher = accountDataFetcher;
+        this.createAccountDataFetcher = createAccountDataFetcher;
+        this.updateAccountDataFetcher = updateAccountDataFetcher;
+        this.postDataFetcher = postDataFetcher;
+        this.allPostDataFetcher = allPostDataFetcher;
+        this.createPostDataFetcher = createPostDataFetcher;
+        this.updatePostDataFetcher = updatePostDataFetcher;
+        this.deletePostDataFetcher = deletePostDataFetcher;
+        this.allReplyDataFetcher = allReplyDataFetcher;
+        this.createReplyDataFetcher = createReplyDataFetcher;
+        this.deleteReplyDataFetcher = deleteReplyDataFetcher;
+        this.replyDataFetcher = replyDataFetcher;
+        this.updateReplyDataFetcher = updateReplyDataFetcher;
+        this.likePostDataFetcher = likePostDataFetcher;
     }
 
     public ExecutionResult execute(String query){
+        System.out.println("AccountServiceGraphQLProvider execute=====================");
         return graphQL.execute(query);
     }
 
     public void loadSchema() throws IOException {
+
+        System.out.println("AccountServiceGraphQLProvider load schema=====================");
 
         try{
 
@@ -66,7 +96,23 @@ public class AccountServiceGraphQLProvider implements AccountServiceGraphQL {
             RuntimeWiring runtimeWiring = newRuntimeWiring()
                     .type("Query", builder -> builder
                             .dataFetcher("allAccounts",allAccountDataFetcher)
-                            .dataFetcher("Account",accountDataFetcher))
+                            .dataFetcher("Account",accountDataFetcher)
+                            .dataFetcher("Post",postDataFetcher)
+                            .dataFetcher("allPosts",allPostDataFetcher)
+                            .dataFetcher("Reply",replyDataFetcher)
+                            .dataFetcher("allReplys",allReplyDataFetcher)
+                    )
+                    .type("Mutation", builder -> builder
+                            .dataFetcher("updateAccount", updateAccountDataFetcher)
+                            .dataFetcher("createAccount",createAccountDataFetcher)
+                            .dataFetcher("createPost",createPostDataFetcher)
+                            .dataFetcher("updatePost",updatePostDataFetcher)
+                            .dataFetcher("deletePost",deletePostDataFetcher)
+                            .dataFetcher("createReply",createReplyDataFetcher)
+                            .dataFetcher("updateReply",updateReplyDataFetcher)
+                            .dataFetcher("deleteReply",deleteReplyDataFetcher)
+                            .dataFetcher("addLikePost",likePostDataFetcher)
+                    )
                     .build();
             SchemaGenerator schemaGenerator = new SchemaGenerator();
             GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry,runtimeWiring);

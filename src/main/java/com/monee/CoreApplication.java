@@ -3,18 +3,12 @@ package com.monee;
 import com.monee.Filter.LoginFilter;
 import com.monee.controller.handler.ControllerHandler;
 import com.monee.controller.handler.RestControllerHandler;
-import com.monee.controller.resolver.ControllerResolver;
 import com.monee.dao.AccountDao;
-import com.monee.graphql.AccountServiceGraphQLProvider;
-import com.monee.graphql.DataFetcher.AccountDataFetcher;
-import com.monee.graphql.DataFetcher.AllAccountDataFetcher;
-import com.monee.model.Account;
 import com.monee.service.AccountService;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 public class CoreApplication {
@@ -36,7 +30,9 @@ public class CoreApplication {
         server.createContext("/api/account/login",new RestControllerHandler(accountService));
         server.createContext("/api/account/signup",new RestControllerHandler(accountService));
         server.createContext("/api/account/logout",new RestControllerHandler(accountService));
-        server.createContext("/api/account/view",new RestControllerHandler(accountService));
+        server.createContext("/api/account",new RestControllerHandler(accountService));
+        server.createContext("/api/post", new RestControllerHandler(accountService));
+        server.createContext("/api/reply", new RestControllerHandler(accountService));
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
 

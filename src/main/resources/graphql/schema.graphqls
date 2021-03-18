@@ -1,42 +1,164 @@
+"""
+계정
+"""
 type Account {
+    """
+    계정 시퀀스
+    """
     seq : ID!
+    """
+    계정 이메일
+    """
     email : String
+    """
+    계정 닉네임
+    """
     nickname : String
+    """
+    계정 암호(암호화)
+    """
     password : String
+    """
+    계정 권한
+    """
     role : [Role]
 }
 
+"""
+게시글
+"""
 type Post {
-        seq : ID!
-        title : String!
-        content : String!
-        authorSeq : Account
-        revwCnt : Int
-        replyList : [Reply!]
-
+    """
+    게시글 시퀀스
+    """
+    seq : ID!
+    """
+    게시글 제목
+    """
+    title : String!
+    """
+    게시글 내용
+    """
+    content : String!
+    """
+    게시글 작성자
+    """
+    author : Account
+    """
+    게시글 댓글 숫자
+    """
+    revwCnt : Int
+    """
+    게시글 댓글 리스트
+    """
+    replyList : [Reply!]
 }
 
+"""
+댓글
+"""
 type Reply {
+    """
+    댓글 시퀀스
+    """
     seq : ID!
+    """
+    댓글 내용
+    """
     content : String!
+    """
+    댓글 작성자
+    """
     author : Account
 }
 
+"""
+권한
+"""
 enum Role {
+    """
+    사용자 권한
+    """
     USER
+    """
+    관리자 권한
+    """
     ADMIN
 }
 
+"""
+쿼리
+"""
 type Query {
-    Account(seq : ID) : Account
-    allAccounts(title:String,content:String) : [Account!]!
-    post(seq : ID!) : Post
-    allPosts : [Post!]!
-    reply(seq : ID!) : Reply
-    allReplys : [Reply!]!
+    """
+    (결과)계정
+    """
+    Account(seq : ID) : ResultApiWithAccount!
+    allAccounts(title:String,content:String) : ResultApiWithAllAccount!
+    Post(seq : ID!) : ResultApiWithPost!
+    allPosts : ResultApiWithAllPosts!
+    Reply(seq : ID!) : ResultApiWithReply!
+    allReplys(post_seq:String) : ResultApiWithAllReplys!
 }
 
+type Mutation {
+    createAccount(
+        email:String,
+        nickname:String,
+        password:String
+    ) : ResultApiWithAccount!
+    updateAccount(seq:ID!,nickname:String,password:String) : ResultApiWithAccount
+    createPost(title:String, content:String, author_seq:String): ResultApiWithPost
+    updatePost(seq:ID!,title:String,content:String) :ResultApiWithPost
+    deletePost(seq:ID!) : ResultApiWithPost!
+    addLikePost(account_seq:String!,post_seq:String!,isAdd:Boolean) : ResultApi!
+    createReply(author_seq:String,post_seq:String,content:String):ResultApiWithReply!
+    updateReply(seq:ID!,content:String):ResultApiWithReply!
+    deleteReply(seq:ID!):ResultApiWithReply!
+}
+
+type ResultApiWithAllAccount{
+    success : Boolean!
+    status : Int!
+    data : [Account!]!
+}
+
+type ResultApiWithAccount{
+    success : Boolean!
+    status : Int!
+    data : Account
+}
+
+type ResultApiWithAllPosts{
+    success : Boolean!
+    status : Int!
+    data : [Post!]!
+}
+
+type ResultApiWithPost {
+    success : Boolean!
+    status : Int!
+    data : Post!
+}
+
+type ResultApiWithReply {
+    success : Boolean!
+    status : Int!
+    data : Reply!
+}
+
+type ResultApiWithAllReplys {
+    success : Boolean!
+    status : Int!
+    data : [Reply!]!
+}
+
+type ResultApi{
+    success : Boolean!
+    status : Int!
+}
 
 schema {
-    query : Query
+    query : Query,
+    mutation: Mutation
 }

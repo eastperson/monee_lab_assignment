@@ -36,6 +36,17 @@ public class AccountService {
         return null;
     }
 
+    public Account updateNickname(Long seq, String nickname) throws SQLException {
+        int result = accountDao.updateNickname(seq,nickname);
+        if(result < 1) return null;
 
+        return accountDao.findById(seq).orElseThrow(NullPointerException::new);
+    }
 
+    public Account updatePassword(Long seq, String password) {
+        int result = accountDao.updatePassword(seq,password);
+        if(result < 1) return null;
+
+        return accountDao.findById(seq).orElseThrow(NullPointerException::new);
+    }
 }

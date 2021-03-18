@@ -37,38 +37,23 @@ public class ReplyDao {
     PreparedStatement pstmt = null;
     ResultSet rs;
 
-    private AccountDao accountDao;
+    private final AccountDao accountDao;
 
-    public void setAccountDao(AccountDao accountDao) {
-        this.accountDao = accountDao;
-    }
+    private final PostDao postDao;
 
-    public void setPostDao(PostDao postDao) {
-        this.postDao = postDao;
-    }
-
-    private PostDao postDao;
-
-    public ReplyDao(){
-        try(Connection conn = DriverManager.getConnection(
-                DB_URL,
-                DB_USER,
-                DB_PASSWORD)){
-            this.conn = conn;
-            System.out.println("connection 생성 : "+conn);
-        }catch(Exception e) {
-            fail(e.getMessage());
-        }
-    }
     public ReplyDao(AccountDao accountDao, PostDao postDao){
+        this.postDao = postDao;
+        this.accountDao = accountDao;
         try(Connection conn = DriverManager.getConnection(
                 DB_URL,
                 DB_USER,
                 DB_PASSWORD)){
             this.conn = conn;
             System.out.println("connection 생성 : "+conn);
+
         }catch(Exception e) {
             fail(e.getMessage());
+
         }
     }
 
@@ -147,6 +132,8 @@ public class ReplyDao {
 
     public List<Reply> findByPostId(Long postSeq) throws SQLException {
 
+        AccountDao accountDao = new AccountDao();
+
         String query = "SELECT * FROM replys WHERE post_seq =?";
 
         Reply reply = null;
@@ -170,6 +157,7 @@ public class ReplyDao {
                 reply.setSeq(rs.getLong("seq"));
                 reply.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
                 reply.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                reply.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
                 list.add(reply);
             }
 
@@ -184,6 +172,8 @@ public class ReplyDao {
     }
 
     public List<Reply> findAll() throws SQLException {
+
+        AccountDao accountDao = new AccountDao();
 
         String query = "SELECT * FROM replys";
 
@@ -208,6 +198,7 @@ public class ReplyDao {
                 reply.setSeq(rs.getLong("seq"));
                 reply.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
                 reply.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                reply.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
                 list.add(reply);
             }
             return list;

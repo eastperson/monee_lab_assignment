@@ -185,4 +185,32 @@ public class AccountDao{
 
         }
     }
+
+    public int updatePassword(Long seq, String password) {
+
+        String query = "UPDATE accounts SET password = (?) WHERE seq = (?)";
+
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement= connection.prepareStatement(query);)
+        {
+            System.out.println("save conn : " + this.conn);
+
+            this.pstmt = preparedStatement;
+            pstmt.setString(1,password);
+            pstmt.setLong(2,seq);
+
+            System.out.println("pass");
+
+            int result = pstmt.executeUpdate();
+
+            return result;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return -1;
+
+        }
+    }
 }

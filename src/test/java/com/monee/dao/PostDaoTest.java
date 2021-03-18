@@ -80,7 +80,9 @@ public class PostDaoTest {
         AccountDao accountDao = new AccountDao();
         Account account = accountDao.findAll().get(0);
         assertNotNull(account);
-        ReplyDao replyDao = new ReplyDao();
+
+        PostDao postDao = new PostDao();
+        ReplyDao replyDao = new ReplyDao(accountDao,postDao);
         postDao = new PostDao(accountDao,replyDao);
         Post post = new Post("타이틀","콘텐츠");
         Optional<Post> result = postDao.save(account.getSeq(),post);

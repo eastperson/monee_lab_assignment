@@ -65,7 +65,12 @@ CREATE TABLE Accounts_roles
     `role`         VARCHAR(50)    NOT NULL    COMMENT '권한'
 );
 
-
+CREATE TABLE Likes
+(
+    `Account_seq`  BIGINT    NOT NULL    COMMENT '계정',
+    `Post_seq`     BIGINT    NOT NULL    COMMENT '게시글',
+    PRIMARY KEY (Account_seq, Post_seq)
+);
 
 /**
 
@@ -109,5 +114,11 @@ ALTER TABLE Posts_replys
     ADD CONSTRAINT FK_Posts_replys_Reply_seq_Replys_seq FOREIGN KEY (Reply_seq)
         REFERENCES Replys (seq) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
+ALTER TABLE Likes
+    ADD CONSTRAINT FK_Likes_Account_seq_Accounts_seq FOREIGN KEY (Account_seq)
+        REFERENCES Accounts (seq) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
+ALTER TABLE Likes
+    ADD CONSTRAINT FK_Likes_Post_seq_Posts_seq FOREIGN KEY (Post_seq)
+        REFERENCES Posts (seq) ON DELETE RESTRICT ON UPDATE RESTRICT;
 

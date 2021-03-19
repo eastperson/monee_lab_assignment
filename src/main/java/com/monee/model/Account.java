@@ -2,9 +2,6 @@ package com.monee.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.monee.security.Jwt;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.management.relation.Role;

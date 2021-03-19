@@ -7,7 +7,6 @@ import com.monee.dao.AccountDao;
 import com.monee.pool.ObjectPool;
 import com.monee.service.AccountService;
 import com.sun.net.httpserver.HttpServer;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +18,7 @@ import static java.lang.Thread.sleep;
 
 public class CoreApplication implements Runnable {
     private static Logger log = LoggerFactory.getLogger(CoreApplication.class);
+
     public static void main(String[] args) throws IOException, NoSuchMethodException {
         log.info("===================================");
         serverStart();
@@ -57,11 +57,13 @@ public class CoreApplication implements Runnable {
         log.info("server starting..................");
     }
 
-    @SneakyThrows
     @Override
     public void run() {
         log.info("===================================");
-        serverStart();
-        sleep(100000);
+        try {
+            serverStart();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

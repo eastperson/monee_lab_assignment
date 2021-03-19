@@ -27,7 +27,7 @@ public class ReplyTest {
     void findById() throws SQLException {
 
         AccountDao accountDao = new AccountDao();
-        PostDao postDao = new PostDao();
+        PostDao postDao = new PostDao(accountDao);
         ReplyDao replyDao = new ReplyDao(accountDao,postDao);
 
         Optional<Reply> result = replyDao.findById(1L);
@@ -49,7 +49,7 @@ public class ReplyTest {
     void findByIdWithAccount() throws SQLException {
 
         AccountDao accountDao = new AccountDao();
-        PostDao postDao = new PostDao();
+        PostDao postDao = new PostDao(accountDao);
         ReplyDao replyDao = new ReplyDao(accountDao,postDao);
 
         Optional<Reply> result = replyDao.findByIdWithAccount(1L);
@@ -106,7 +106,7 @@ public class ReplyTest {
         Account account = accountDao.findAll().get(0);
         assertNotNull(account);
 
-        PostDao postDao = new PostDao(accountDao,replyDao);
+        PostDao postDao = new PostDao(accountDao);
         ReplyDao replyDao = new ReplyDao(accountDao,postDao);
         Post post = new Post("타이틀","콘텐츠");
         Optional<Post> result = postDao.save(account.getSeq(),post);

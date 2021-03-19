@@ -6,7 +6,6 @@ import com.monee.service.ReplyService;
 import com.monee.utils.ResultApi;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

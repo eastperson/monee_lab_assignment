@@ -45,17 +45,7 @@ public class PostDao {
 
     private static Logger log = LoggerFactory.getLogger(PostDao.class);
 
-    public void setAccountDao(AccountDao accountDao) {
-        this.accountDao = accountDao;
-    }
-
-    public void setReplyDao(ReplyDao replyDao) {
-        this.replyDao = replyDao;
-    }
-
     private AccountDao accountDao;
-    private ReplyDao replyDao;
-    private static ObjectPool pool = ObjectPool.getInstance();
 
     public PostDao(){
         try(Connection conn = DriverManager.getConnection(
@@ -69,7 +59,7 @@ public class PostDao {
         }
     }
 
-    public PostDao(AccountDao accountDao, ReplyDao replyDao){
+    public PostDao(AccountDao accountDao){
         try(Connection conn = DriverManager.getConnection(
                 DB_URL,
                 DB_USER,
@@ -80,7 +70,6 @@ public class PostDao {
             fail(e.getMessage());
         }
         this.accountDao = accountDao;
-        this.replyDao = replyDao;
     }
 
     public Optional<Post> findById(Long seq) throws SQLException {
@@ -89,110 +78,116 @@ public class PostDao {
 
         Post post = null;
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            pstmt.setLong(1,seq);
-            log.info("pass");
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("find by seq conn : " + this.conn);
 
-            rs = pstmt.executeQuery();
+                pstmt.setLong(1, seq);
+                log.info("pass");
 
-            while (rs.next()){
-                post = new Post(rs.getString("title"),rs.getString("content"));
-                post.setRevwCnt(rs.getLong("revw_cnt"));
-                post.setSeq(rs.getLong("seq"));
-                post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
-                post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    post = new Post(rs.getString("title"), rs.getString("content"));
+                    post.setRevwCnt(rs.getLong("revw_cnt"));
+                    post.setSeq(rs.getLong("seq"));
+                    post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
+                    post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                }
+
+                return Optional.of(post);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return Optional.of(post);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
 
         }
     }
 
     public Optional<Post> findByIdWithAccount(Long seq) throws SQLException {
 
-        AccountDao accountDao = pool.getAccountDao();
-        setAccountDao(accountDao);
-
         String query = "SELECT * FROM posts WHERE seq =?";
 
         Post post = null;
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            pstmt.setLong(1,seq);
-            log.info("pass");
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("find by seq conn : " + this.conn);
 
-            rs = pstmt.executeQuery();
+                pstmt.setLong(1, seq);
+                log.info("pass");
 
-            while (rs.next()){
-                post = new Post(rs.getString("title"),rs.getString("content"));
-                post.setSeq(rs.getLong("seq"));
-                post.setRevwCnt(rs.getLong("revw_cnt"));
-                post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
-                post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
-                post.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    post = new Post(rs.getString("title"), rs.getString("content"));
+                    post.setSeq(rs.getLong("seq"));
+                    post.setRevwCnt(rs.getLong("revw_cnt"));
+                    post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
+                    post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                    post.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
+                }
+
+                return Optional.of(post);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return Optional.of(post);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
-
         }
     }
 
     public Optional<Post> findByIdWithReplyList(Long seq) throws SQLException {
 
+        ObjectPool pool = ObjectPool.getInstance();
+
         String query = "SELECT * FROM posts WHERE seq =?";
 
         Post post = null;
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            pstmt.setLong(1,seq);
-            log.info("pass");
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("find by seq conn : " + this.conn);
 
-            rs = pstmt.executeQuery();
+                pstmt.setLong(1, seq);
+                log.info("pass");
 
-            while (rs.next()){
-                post = new Post(rs.getString("title"),rs.getString("content"));
-                post.setSeq(rs.getLong("seq"));
-                post.setRevwCnt(rs.getLong("revw_cnt"));
-                post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
-                post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
-                post.setReplyList(replyDao.findByPostId(post.getSeq()));
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    post = new Post(rs.getString("title"), rs.getString("content"));
+                    post.setSeq(rs.getLong("seq"));
+                    post.setRevwCnt(rs.getLong("revw_cnt"));
+                    post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
+                    post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                    post.setReplyList(pool.getReplyDao().findByPostId(post.getSeq()));
+                }
+
+                return Optional.of(post);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return Optional.of(post);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
-
         }
     }
 
@@ -200,34 +195,36 @@ public class PostDao {
 
         String query = "SELECT * FROM posts";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
+        synchronized (ReplyDao.class) {
 
-            log.info("find all conn : " + this.conn);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
 
-            log.info("pass");
+                log.info("find all conn : " + this.conn);
 
-            rs = pstmt.executeQuery();
+                log.info("pass");
 
-            List<Post> list = new ArrayList<>();
+                rs = pstmt.executeQuery();
 
-            while (rs.next()){
-                Post post = new Post(rs.getString("title"),rs.getString("content"));
-                post.setRevwCnt(rs.getLong("revw_cnt"));
-                post.setSeq(rs.getLong("seq"));
-                post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
-                post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
-                list.add(post);
+                List<Post> list = new ArrayList<>();
+
+                while (rs.next()) {
+                    Post post = new Post(rs.getString("title"), rs.getString("content"));
+                    post.setRevwCnt(rs.getLong("revw_cnt"));
+                    post.setSeq(rs.getLong("seq"));
+                    post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
+                    post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                    list.add(post);
+                }
+                return list;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return Collections.EMPTY_LIST;
+
             }
-            return list;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.EMPTY_LIST;
-
         }
     }
 
@@ -235,38 +232,40 @@ public class PostDao {
 
         String query = "INSERT INTO posts (title,content,author_seq) VALUES(?,?,?);";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setString(1,post.getTitle());
-            pstmt.setString(2,post.getContent());
-            pstmt.setLong(3,accountSeq);
-            log.info("pass");
-            log.info("meta data : "+pstmt.getParameterMetaData());
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);) {
+                log.info("save conn : " + this.conn);
 
-            int result = pstmt.executeUpdate();
-            log.info("저장한 개수 " + result);
+                this.pstmt = preparedStatement;
+                pstmt.setString(1, post.getTitle());
+                pstmt.setString(2, post.getContent());
+                pstmt.setLong(3, accountSeq);
+                log.info("pass");
+                log.info("meta data : " + pstmt.getParameterMetaData());
 
-            rs = pstmt.getGeneratedKeys();
+                int result = pstmt.executeUpdate();
+                log.info("저장한 개수 " + result);
 
-            Optional<Post> newPost = null;
+                rs = pstmt.getGeneratedKeys();
 
-            if(rs.next()){
-                Long key = rs.getLong(1);
-                log.info(String.valueOf(key));
-                newPost = findById(key);
+                Optional<Post> newPost = null;
+
+                if (rs.next()) {
+                    Long key = rs.getLong(1);
+                    log.info(String.valueOf(key));
+                    newPost = findById(key);
+                }
+
+                return newPost;
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return newPost;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
-
         }
     }
 
@@ -274,28 +273,30 @@ public class PostDao {
 
         String query = "UPDATE posts SET title = (?), update_at = (?) WHERE seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setString(1,title);
-            pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
-            pstmt.setLong(3,seq);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                log.info("save conn : " + this.conn);
 
-            log.info("pass");
+                this.pstmt = preparedStatement;
+                pstmt.setString(1, title);
+                pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
+                pstmt.setLong(3, seq);
 
-            int result = pstmt.executeUpdate();
+                log.info("pass");
 
-            return result;
+                int result = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+                return result;
 
-            e.printStackTrace();
+            } catch (Exception e) {
 
-            return -1;
+                e.printStackTrace();
 
+                return -1;
+
+            }
         }
     }
 
@@ -303,28 +304,30 @@ public class PostDao {
 
         String query = "UPDATE posts SET content = (?), update_at = (?) WHERE seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setString(1,content);
-            pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
-            pstmt.setLong(3,seq);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                log.info("save conn : " + this.conn);
 
-            log.info("pass");
+                this.pstmt = preparedStatement;
+                pstmt.setString(1, content);
+                pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
+                pstmt.setLong(3, seq);
 
-            int result = pstmt.executeUpdate();
+                log.info("pass");
 
-            return result;
+                int result = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+                return result;
 
-            e.printStackTrace();
+            } catch (Exception e) {
 
-            return -1;
+                e.printStackTrace();
 
+                return -1;
+
+            }
         }
     }
 
@@ -332,26 +335,28 @@ public class PostDao {
 
         String query = "DELETE FROM posts WHERE seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setLong(1,seq);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                log.info("save conn : " + this.conn);
 
-            log.info("pass");
+                this.pstmt = preparedStatement;
+                pstmt.setLong(1, seq);
 
-            int result = pstmt.executeUpdate();
+                log.info("pass");
 
-            return result;
+                int result = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+                return result;
 
-            e.printStackTrace();
+            } catch (Exception e) {
 
-            return -1;
+                e.printStackTrace();
 
+                return -1;
+
+            }
         }
     }
 
@@ -359,66 +364,69 @@ public class PostDao {
 
         String query = "UPDATE posts SET revw_cnt = revw_cnt + 1 WHERE seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setLong(1,seq);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                log.info("save conn : " + this.conn);
 
-            log.info("pass");
+                this.pstmt = preparedStatement;
+                pstmt.setLong(1, seq);
 
-            int result = pstmt.executeUpdate();
+                log.info("pass");
 
-            return result;
+                int result = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+                return result;
 
-            e.printStackTrace();
+            } catch (Exception e) {
 
-            return -1;
+                e.printStackTrace();
+
+                return -1;
+            }
         }
     }
 
     public Optional<Post> findByIdWithAll(Long seq) {
 
-        AccountDao accountDao = new AccountDao();
-        ReplyDao replyDao = new ReplyDao(accountDao,this);
+        ObjectPool pool = ObjectPool.getInstance();
 
         String query = "SELECT * FROM posts WHERE seq =?";
 
         Post post = null;
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
+        synchronized (ReplyDao.class) {
 
-            pstmt.setLong(1,seq);
-            log.info("pass");
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("find by seq conn : " + this.conn);
 
-            rs = pstmt.executeQuery();
+                pstmt.setLong(1, seq);
+                log.info("pass");
 
-            while (rs.next()){
-                post = new Post(rs.getString("title"),rs.getString("content"));
-                post.setSeq(rs.getLong("seq"));
-                post.setRevwCnt(rs.getLong("revw_cnt"));
-                post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
-                post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
-                post.setReplyList(replyDao.findByPostId(post.getSeq()));
-                post.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    post = new Post(rs.getString("title"), rs.getString("content"));
+                    post.setSeq(rs.getLong("seq"));
+                    post.setRevwCnt(rs.getLong("revw_cnt"));
+                    post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
+                    post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
+                    post.setReplyList(pool.getReplyDao().findByPostId(post.getSeq()));
+                    post.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
+                }
+
+                return Optional.of(post);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return Optional.of(post);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
-
         }
     }
 }

@@ -36,7 +36,7 @@ public class GraphQLTest {
         CreateAccountDataFetcher createAccountDataFetcher = new CreateAccountDataFetcher(accountService);
         UpdateAccountDataFetcher updateAccountDataFetcher = new UpdateAccountDataFetcher(accountService);
 
-        PostDao postDao = new PostDao();
+        PostDao postDao = new PostDao(accountDao);
         LikeDao likeDao = new LikeDao();
         PostService postService = new PostService(postDao,likeDao);
         PostDataFetcher postDataFetcher = new PostDataFetcher(postService);

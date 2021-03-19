@@ -57,20 +57,22 @@ public class ObjectPool {
 
     public static ObjectPool getInstance(){
         if(objectPool == null) {
-            System.out.println("  ______ _____  _       _____  ________      __\n" +
-                    " |  ____|  __ \\( )     |  __ \\|  ____\\ \\    / /\n" +
-                    " | |__  | |__) |/ ___  | |  | | |__   \\ \\  / /\n" +
-                    " |  __| |  ___/  / __| | |  | |  __|   \\ \\/ /\n" +
-                    " | |____| |      \\__ \\ | |__| | |____   \\  /\n" +
-                    " |______|_|      |___/ |_____/|______|   \\/");
-            objectPool = new ObjectPool();
+            synchronized (ObjectPool.class){
+                System.out.println("  ______ _____  _       _____  ________      __\n" +
+                        " |  ____|  __ \\( )     |  __ \\|  ____\\ \\    / /\n" +
+                        " | |__  | |__) |/ ___  | |  | | |__   \\ \\  / /\n" +
+                        " |  __| |  ___/  / __| | |  | |  __|   \\ \\/ /\n" +
+                        " | |____| |      \\__ \\ | |__| | |____   \\  /\n" +
+                        " |______|_|      |___/ |_____/|______|   \\/");
+                objectPool = new ObjectPool();
+            }
         }
         return objectPool;
     }
 
     public ObjectPool(){
         this.accountDao = new AccountDao();
-        this.postDao = new PostDao();
+        this.postDao = new PostDao(accountDao);
         this.replyDao = new ReplyDao(accountDao,postDao);
         this.likeDao = new LikeDao();
         this.accountService = new AccountService(accountDao);

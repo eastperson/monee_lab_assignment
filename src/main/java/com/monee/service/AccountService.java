@@ -56,7 +56,7 @@ public class AccountService {
     }
 
     public Account updatePassword(Long seq, String password) {
-        int result = accountDao.updatePassword(seq,password);
+        int result = accountDao.updatePassword(seq,BCrypt.hashpw(password,BCrypt.gensalt()));
         if(result < 1) return null;
 
         return accountDao.findById(seq).orElseThrow(NullPointerException::new);

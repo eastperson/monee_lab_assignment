@@ -9,7 +9,6 @@ import com.monee.security.Jwt;
 import com.monee.service.AccountService;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,7 @@ public class LoginFilter extends Filter {
 
     private static Logger log = LoggerFactory.getLogger(LoginFilter.class);
 
-    @SneakyThrows
+
     @Override
     public void doFilter(HttpExchange exchange, Chain chain) throws IOException {
         URI uri = exchange.getRequestURI();

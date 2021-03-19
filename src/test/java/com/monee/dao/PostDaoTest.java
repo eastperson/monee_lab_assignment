@@ -87,7 +87,7 @@ public class PostDaoTest {
 
         PostDao postDao = new PostDao();
         ReplyDao replyDao = new ReplyDao(accountDao,postDao);
-        postDao = new PostDao(accountDao,replyDao);
+        postDao = new PostDao(accountDao);
         Post post = new Post("타이틀","콘텐츠");
         Optional<Post> result = postDao.save(account.getSeq(),post);
 

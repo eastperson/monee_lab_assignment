@@ -2,6 +2,7 @@ package com.monee.dao;
 
 import com.monee.controller.handler.ControllerHandler;
 import com.monee.model.Account;
+import com.monee.pool.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,14 +42,16 @@ public class AccountDao{
     private static Logger log = LoggerFactory.getLogger(AccountDao.class);
 
     public AccountDao(){
-        try(Connection conn = DriverManager.getConnection(
-                DB_URL,
-                DB_USER,
-                DB_PASSWORD)){
-            this.conn = conn;
-            log.info("connection 생성 : "+conn);
-        }catch(Exception e) {
-            fail(e.getMessage());
+        synchronized (AccountDao.class) {
+            try (Connection conn = DriverManager.getConnection(
+                    DB_URL,
+                    DB_USER,
+                    DB_PASSWORD)) {
+                this.conn = conn;
+                log.info("connection 생성 : " + conn);
+            } catch (Exception e) {
+                fail(e.getMessage());
+            }
         }
     }
 
@@ -58,32 +61,34 @@ public class AccountDao{
 
         Account account = null;
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
-            log.info("seq : " + seq);
+        synchronized (AccountDao.class) {
 
-            pstmt.setLong(1,seq);
-            log.info("pass");
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("find by seq conn : " + this.conn);
+                log.info("seq : " + seq);
 
-            rs = pstmt.executeQuery();
+                pstmt.setLong(1, seq);
+                log.info("pass");
 
-            while (rs.next()){
-                account = new Account(rs.getString(2),rs.getString(3),rs.getString(4));
-                account.setSeq(rs.getLong(1));
-                account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    account = new Account(rs.getString(2), rs.getString(3), rs.getString(4));
+                    account.setSeq(rs.getLong(1));
+                    account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
+                }
+
+                return Optional.of(account);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return Optional.of(account);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
-
         }
     }
 
@@ -91,32 +96,34 @@ public class AccountDao{
 
         String query = "SELECT * FROM ACCOUNTS";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
+        synchronized (AccountDao.class) {
 
-            log.info("find all conn : " + this.conn);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
 
-            log.info("pass");
+                log.info("find all conn : " + this.conn);
 
-            rs = pstmt.executeQuery();
+                log.info("pass");
 
-            List<Account> list = new ArrayList<>();
+                rs = pstmt.executeQuery();
 
-            while (rs.next()){
-                Account account = new Account(rs.getString(2),rs.getString(3),rs.getString(4));
-                account.setSeq(rs.getLong(1));
-                account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
-                list.add(account);
+                List<Account> list = new ArrayList<>();
+
+                while (rs.next()) {
+                    Account account = new Account(rs.getString(2), rs.getString(3), rs.getString(4));
+                    account.setSeq(rs.getLong(1));
+                    account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
+                    list.add(account);
+                }
+                return list;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return Collections.EMPTY_LIST;
+
             }
-            return list;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.EMPTY_LIST;
-
         }
     }
 
@@ -128,37 +135,42 @@ public class AccountDao{
 
         String query = "INSERT INTO accounts (email,nickname,password) VALUES(?,?,?);";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);)
-        {
-            log.info("save conn : " + this.conn);
 
-            this.pstmt = preparedStatement;
-            pstmt.setString(1,account.getEmail());
-            pstmt.setString(2,account.getNickname());
-            pstmt.setString(3,account.getPassword());
-            log.info("pass");
-            log.info("meta data : "+pstmt.getParameterMetaData());
+        synchronized (AccountDao.class){
 
-            int result = pstmt.executeUpdate();
-            log.info("저장한 개수 " + result);
+            try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+                PreparedStatement preparedStatement= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);)
+            {
+                log.info("save conn : " + this.conn);
 
-            rs = pstmt.getGeneratedKeys();
+                this.pstmt = preparedStatement;
+                pstmt.setString(1,account.getEmail());
+                pstmt.setString(2,account.getNickname());
+                pstmt.setString(3,account.getPassword());
+                log.info("pass");
+                log.info("meta data : "+pstmt.getParameterMetaData());
 
-            Optional<Account> newAccount = null;
+                int result = pstmt.executeUpdate();
+                log.info("저장한 개수 " + result);
 
-            if(rs.next()){
-                Long key = rs.getLong(1);
-                log.info(String.valueOf(key));
-                newAccount = findById(key);
+                rs = pstmt.getGeneratedKeys();
+
+                Optional<Account> newAccount = null;
+
+                if(rs.next()){
+                    Long key = rs.getLong(1);
+                    log.info(String.valueOf(key));
+                    newAccount = findById(key);
+                }
+
+                return newAccount;
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return newAccount;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
 
         }
     }
@@ -167,27 +179,29 @@ public class AccountDao{
 
         String query = "UPDATE accounts SET nickname = (?) WHERE seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (AccountDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setString(1,nickname);
-            pstmt.setLong(2,seq);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                log.info("update nickname conn : " + this.conn);
 
-            log.info("pass");
+                this.pstmt = preparedStatement;
+                pstmt.setString(1, nickname);
+                pstmt.setLong(2, seq);
 
-            int result = pstmt.executeUpdate();
+                log.info("pass");
 
-            return result;
+                int result = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+                return result;
 
-            e.printStackTrace();
+            } catch (Exception e) {
 
-            return -1;
+                e.printStackTrace();
 
+                return -1;
+
+            }
         }
     }
 
@@ -195,27 +209,29 @@ public class AccountDao{
 
         String query = "UPDATE accounts SET password = (?) WHERE seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("save conn : " + this.conn);
+        synchronized (AccountDao.class) {
 
-            this.pstmt = preparedStatement;
-            pstmt.setString(1,password);
-            pstmt.setLong(2,seq);
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                log.info("update password conn : " + this.conn);
 
-            log.info("pass");
+                this.pstmt = preparedStatement;
+                pstmt.setString(1, password);
+                pstmt.setLong(2, seq);
 
-            int result = pstmt.executeUpdate();
+                log.info("pass");
 
-            return result;
+                int result = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+                return result;
 
-            e.printStackTrace();
+            } catch (Exception e) {
 
-            return -1;
+                e.printStackTrace();
 
+                return -1;
+
+            }
         }
     }
 
@@ -224,32 +240,34 @@ public class AccountDao{
 
         Account account = null;
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by email conn : " + this.conn);
-            log.info("email : " + email);
+        synchronized (AccountDao.class) {
 
-            pstmt.setString(1,email);
-            log.info("pass");
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("find by email conn : " + this.conn);
+                log.info("email : " + email);
 
-            rs = pstmt.executeQuery();
+                pstmt.setString(1, email);
+                log.info("pass");
 
-            while (rs.next()){
-                account = new Account(rs.getString(2),rs.getString(3),rs.getString(4));
-                account.setSeq(rs.getLong(1));
-                account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    account = new Account(rs.getString(2), rs.getString(3), rs.getString(4));
+                    account.setSeq(rs.getLong(1));
+                    account.setCreateAt(dateTimeOf(rs.getTimestamp(5)));
+                }
+
+                return Optional.of(account);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return Optional.empty();
+
             }
-
-            return Optional.of(account);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return Optional.empty();
-
         }
     }
 }

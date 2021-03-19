@@ -13,7 +13,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import graphql.ExecutionResult;
-import lombok.SneakyThrows;
+import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +47,6 @@ public class RestControllerHandler implements HttpHandler  {
     private static Logger log = LoggerFactory.getLogger(RestControllerHandler.class);
     private Jwt jwt;
 
-    @SneakyThrows
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
@@ -257,17 +257,21 @@ public class RestControllerHandler implements HttpHandler  {
                     log.info("password : " + password);
                     log.info("result : " + result);
 
-                    if(accountService.login(email,password)){
-                        log.info("login success");
-                        Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
-                        Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
-                        String accessToken = account.newJwt(jwt);
-                        result.setData(new LoginResult(accessToken,account));
-                        result.setSuccess(true);
-                        result.setStatus(ResultApi.statusCode.OK);
-                        log.info(String.valueOf(result));
-                        status = 200;
-                        //exchange.sendResponseHeaders(ResultApi.statusCode.OK,result.toString().length());
+                    try {
+                        if(accountService.login(email,password)){
+                            log.info("login success");
+                            Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+                            Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
+                            String accessToken = account.newJwt(jwt);
+                            result.setData(new LoginResult(accessToken,account));
+                            result.setSuccess(true);
+                            result.setStatus(ResultApi.statusCode.OK);
+                            log.info(String.valueOf(result));
+                            status = 200;
+                            //exchange.sendResponseHeaders(ResultApi.statusCode.OK,result.toString().length());
+                        }
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
                     }
 
                     //AccountDto dto = gson.fromJson(str, AccountDto.class);
@@ -306,7 +310,12 @@ public class RestControllerHandler implements HttpHandler  {
 
                     AccountDto dto = gson.fromJson(str, AccountDto.class);
 
-                    Account account = accountService.signup(dto);
+                    Account account = null;
+                    try {
+                        account = accountService.signup(dto);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
 
                     log.info("account : " + account);
 
@@ -320,16 +329,20 @@ public class RestControllerHandler implements HttpHandler  {
 
                     log.info("result : " + result);
 
-                    if(accountService.login(email,password)){
-                        log.info("login success");
-                        account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
-                        Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
-                        String accessToken = account.newJwt(jwt);
-                        result.setData(new LoginResult(accessToken,account));
-                        result.setSuccess(true);
-                        result.setStatus(ResultApi.statusCode.CREATED);
-                        status = 201;
-                        log.info(String.valueOf(result));
+                    try {
+                        if(accountService.login(email,password)){
+                            log.info("login success");
+                            account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+                            Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
+                            String accessToken = account.newJwt(jwt);
+                            result.setData(new LoginResult(accessToken,account));
+                            result.setSuccess(true);
+                            result.setStatus(ResultApi.statusCode.CREATED);
+                            status = 201;
+                            log.info(String.valueOf(result));
+                        }
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
                     }
 
                     respText = gson.toJson(result);
@@ -367,7 +380,12 @@ public class RestControllerHandler implements HttpHandler  {
 
                     log.info("account dto : " + dto);
 
-                    Account account = accountService.signup(dto);
+                    Account account = null;
+                    try {
+                        account = accountService.signup(dto);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
 
                     log.info(String.valueOf(account));
 

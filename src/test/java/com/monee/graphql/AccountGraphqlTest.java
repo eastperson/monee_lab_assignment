@@ -25,7 +25,6 @@ import com.monee.service.AccountService;
 import com.monee.service.PostService;
 import com.monee.service.ReplyService;
 import graphql.ExecutionResult;
-import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

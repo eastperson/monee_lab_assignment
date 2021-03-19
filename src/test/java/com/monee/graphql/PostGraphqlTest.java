@@ -97,7 +97,7 @@ public class PostGraphqlTest {
 
     }
 
-    @DisplayName("post find by id 테스트")
+    @DisplayName("post find by id with account 테스트")
     @Test
     void findByIdWithAccount() throws IOException {
         AccountServiceGraphQLProvider accountServiceGraphQLProvider = getAccountServiceGraphQLProvider();

@@ -10,12 +10,17 @@ import com.monee.service.AccountService;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 
 public class LoginFilter extends Filter {
+
+    private static Logger log = LoggerFactory.getLogger(LoginFilter.class);
+
     @SneakyThrows
     @Override
     public void doFilter(HttpExchange exchange, Chain chain) throws IOException {
@@ -33,34 +38,53 @@ public class LoginFilter extends Filter {
                 System.out.println("Bearer with token : " + token);
                 token = token.split(" ")[1];
                 System.out.println("token : " + token);
-            }catch (NullPointerException e) {
-                e.printStackTrace();
+
+                String clientSecret = "clientSecret";
+                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(clientSecret))
+                        .withIssuer("issuer")
+                        .build();
+                Jwt.Claims claims = new Jwt.Claims(jwtVerifier.verify(token));
+                String email = claims.getEmail();
+                String password = claims.getPassword();
+                System.out.println("filter email : " + email);
+                System.out.println("filter password : " + password);
+
+                AccountDao accountDao = new AccountDao();
+                AccountService accountService = new AccountService(accountDao);
+
+                try{
+                    Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+
+
+                    System.out.println(account);
+
+                    if(account == null) {
+
+                        System.out.println("login fail ................");
+                        String newUrl = "http://localhost:8080/";
+                        status = 405;
+                        exchange.getResponseHeaders().add("Location", newUrl);
+                        length = respText.getBytes().length;
+                        exchange.getResponseHeaders().set("Content-Type", "application/json");
+
+                        exchange.sendResponseHeaders(status, length);
+                        OutputStream output = exchange.getResponseBody();
+
+                        output.write(respText.getBytes());
+                        output.flush();
+                        exchange.close();
+                    }
+
+                } catch (NullPointerException ne) {
+                    ne.printStackTrace();
+                    log.error("not found email");
+                }
+
+            } catch (NullPointerException e) {
                 System.out.println("authorization null");
-            }
-
-            String clientSecret = "clientSecret";
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(clientSecret))
-                    .withIssuer("issuer")
-                    .build();
-            Jwt.Claims claims = new Jwt.Claims(jwtVerifier.verify(token));
-            String email = claims.getEmail();
-            String password = claims.getPassword();
-            System.out.println("filter email : " + email);
-            System.out.println("filter password : " + password);
-
-            AccountDao accountDao = new AccountDao();
-            AccountService accountService = new AccountService(accountDao);
-
-            Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
-
-            System.out.println(account);
-
-            if(account == null) {
-
-                System.out.println("login fail ................");
                 String newUrl = "http://localhost:8080/";
                 status = 405;
-                exchange.getResponseHeaders().add("Location",newUrl);
+                exchange.getResponseHeaders().add("Location", newUrl);
                 length = respText.getBytes().length;
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
 
@@ -70,11 +94,12 @@ public class LoginFilter extends Filter {
                 output.write(respText.getBytes());
                 output.flush();
                 exchange.close();
+            }
+
             } else {
                 System.out.println("login pass..................");
 
             }
-        }
         chain.doFilter(exchange);
     }
 

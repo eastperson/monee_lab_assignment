@@ -1,41 +1,19 @@
 package com.monee.controller.handler;
 
 import com.google.gson.Gson;
-import com.monee.dao.AccountDao;
-import com.monee.dao.LikeDao;
-import com.monee.dao.PostDao;
-import com.monee.dao.ReplyDao;
 import com.monee.dto.AccountDto;
 import com.monee.dto.LoginResult;
 import com.monee.graphql.AccountServiceGraphQLProvider;
-import com.monee.graphql.DataFetcher.account.AccountDataFetcher;
-import com.monee.graphql.DataFetcher.account.AllAccountDataFetcher;
-import com.monee.graphql.DataFetcher.account.CreateAccountDataFetcher;
-import com.monee.graphql.DataFetcher.account.UpdateAccountDataFetcher;
-import com.monee.graphql.DataFetcher.post.AllPostDataFetcher;
-import com.monee.graphql.DataFetcher.post.CreatePostDataFetcher;
-import com.monee.graphql.DataFetcher.post.DeletePostDataFetcher;
-import com.monee.graphql.DataFetcher.post.LikePostDataFetcher;
-import com.monee.graphql.DataFetcher.post.PostDataFetcher;
-import com.monee.graphql.DataFetcher.post.UpdatePostDataFetcher;
-import com.monee.graphql.DataFetcher.reply.AllReplyDataFetcher;
-import com.monee.graphql.DataFetcher.reply.CreateReplyDataFetcher;
-import com.monee.graphql.DataFetcher.reply.DeleteReplyDataFetcher;
-import com.monee.graphql.DataFetcher.reply.ReplyDataFetcher;
-import com.monee.graphql.DataFetcher.reply.UpdateReplyDataFetcher;
 import com.monee.model.Account;
 import com.monee.pool.ObjectPool;
 import com.monee.security.Jwt;
 import com.monee.service.AccountService;
-import com.monee.service.PostService;
-import com.monee.service.ReplyService;
 import com.monee.utils.ResultApi;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import graphql.ExecutionResult;
 import lombok.SneakyThrows;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +43,7 @@ import static java.util.stream.Collectors.toList;
 public class RestControllerHandler implements HttpHandler  {
 
     private AccountService accountService;
-    private static Logger log = LoggerFactory.getLogger(ControllerHandler.class);
+    private static Logger log = LoggerFactory.getLogger(RestControllerHandler.class);
     private Jwt jwt;
 
     @SneakyThrows
@@ -272,6 +250,8 @@ public class RestControllerHandler implements HttpHandler  {
                     ResultApi<LoginResult> result = new ResultApi<>();
                     result.setSuccess(false);
                     result.setStatus(ResultApi.statusCode.BAD_REQUEST);
+                    status = 400;
+                    //exchange.sendResponseHeaders(400,result.toString().length());
 
                     log.info("email : "+email);
                     log.info("password : " + password);
@@ -286,6 +266,8 @@ public class RestControllerHandler implements HttpHandler  {
                         result.setSuccess(true);
                         result.setStatus(ResultApi.statusCode.OK);
                         log.info(String.valueOf(result));
+                        status = 200;
+                        //exchange.sendResponseHeaders(ResultApi.statusCode.OK,result.toString().length());
                     }
 
                     //AccountDto dto = gson.fromJson(str, AccountDto.class);
@@ -333,6 +315,8 @@ public class RestControllerHandler implements HttpHandler  {
                     ResultApi<LoginResult> result = new ResultApi<>();
                     result.setSuccess(false);
                     result.setStatus(ResultApi.statusCode.BAD_REQUEST);
+                    status = 400;
+                    //exchange.sendResponseHeaders(ResultApi.statusCode.BAD_REQUEST,result.toString().length());
 
                     log.info("result : " + result);
 
@@ -344,6 +328,7 @@ public class RestControllerHandler implements HttpHandler  {
                         result.setData(new LoginResult(accessToken,account));
                         result.setSuccess(true);
                         result.setStatus(ResultApi.statusCode.CREATED);
+                        status = 201;
                         log.info(String.valueOf(result));
                     }
 
@@ -403,9 +388,13 @@ public class RestControllerHandler implements HttpHandler  {
 
             }
 
-            exchange.sendResponseHeaders(status, respText.getBytes().length);
-            OutputStream output = exchange.getResponseBody();
 
+            log.info("exchange response body : " + respText);
+            log.info("status : " + status);
+            log.info("response headers : "+exchange.getResponseHeaders() );
+            exchange.sendResponseHeaders(status, respText.getBytes().length);
+
+            OutputStream output = exchange.getResponseBody();
             output.write(respText.getBytes());
             output.flush();
             exchange.close();

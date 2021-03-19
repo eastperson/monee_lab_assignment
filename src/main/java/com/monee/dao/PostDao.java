@@ -4,6 +4,7 @@ import com.google.protobuf.Empty;
 import com.monee.controller.handler.ControllerHandler;
 import com.monee.model.Account;
 import com.monee.model.Post;
+import com.monee.pool.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ public class PostDao {
 
     private AccountDao accountDao;
     private ReplyDao replyDao;
+    private static ObjectPool pool = ObjectPool.getInstance();
 
     public PostDao(){
         try(Connection conn = DriverManager.getConnection(
@@ -119,7 +121,7 @@ public class PostDao {
 
     public Optional<Post> findByIdWithAccount(Long seq) throws SQLException {
 
-        AccountDao accountDao = new AccountDao();
+        AccountDao accountDao = pool.getAccountDao();
         setAccountDao(accountDao);
 
         String query = "SELECT * FROM posts WHERE seq =?";

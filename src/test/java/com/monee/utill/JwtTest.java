@@ -55,16 +55,16 @@ public class JwtTest {
     void jwt_verfiy(){
 
         String issuer = "issuer";
-        String clientSecret = "moneelab";
-        int expirySeconds = 60*60*7;
+        String clientSecret = "clientSecret";
+        int expirySeconds = 60*60*24*30;
 
         Jwt jwt = new Jwt(issuer,clientSecret,expirySeconds);
-        Account account = new Account("email","nickname","password");
+        Account account = new Account("kjuioqqq@naver.com","eastperson","123123");
         account.setSeq(1L);
         String token = account.newJwt(jwt);
         log.info("account : "+account.toString());
         log.info("token "+token);
-        log.info(jwt.verify("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpc3N1ZXIiLCJuaWNrbmFtZSI6Im5pY2tuYW1lIiwiZXhwIjoxNjE2MDkzODA5LCJpYXQiOjE2MTYwNjg2MDksInVzZXJLZXkiOjEsImVtYWlsIjoiZW1haWwifQ.GCRXlKhtxIM0khysfOoIW5j6mAEjmWPwzqF1XVnSs14azKp6k1-1oco5rraP1CDDZAgtvhmHEadAHdcyJuXHAw").toString());
+        log.info(jwt.verify(token).toString());
 
     }
 }

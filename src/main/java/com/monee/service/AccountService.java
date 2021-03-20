@@ -5,11 +5,15 @@ import com.monee.dto.AccountDto;
 import com.monee.model.Account;
 import javassist.NotFoundException;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.Optional;
 
 public class AccountService {
+
+    private static Logger log = LoggerFactory.getLogger(AccountService.class);
 
     public void setAccountDao(AccountDao accountDao) {
         this.accountDao = accountDao;
@@ -35,7 +39,7 @@ public class AccountService {
     public Account signup(AccountDto accountDto) throws SQLException {
         Account account = new Account(accountDto.getEmail(),accountDto.getNickname(),BCrypt.hashpw(accountDto.getPassword(),BCrypt.gensalt()));
 
-        System.out.println("account service singup : " + account);
+        log.info("account service singup : " + account);
         try{
             Optional<Account> newAccount = accountDao.save(account);
             if(newAccount.isPresent()){
@@ -60,5 +64,10 @@ public class AccountService {
         if(result < 1) return null;
 
         return accountDao.findById(seq).orElseThrow(NullPointerException::new);
+    }
+
+    public Account findById(Long accountSeq) {
+
+        return accountDao.findById(accountSeq).orElseThrow(NullPointerException::new);
     }
 }

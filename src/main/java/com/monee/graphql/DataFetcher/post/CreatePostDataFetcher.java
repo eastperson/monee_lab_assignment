@@ -21,23 +21,11 @@ public class CreatePostDataFetcher implements DataFetcher<ResultApi<Post>> {
     @Override
     public ResultApi<Post> get(DataFetchingEnvironment environment) throws Exception {
 
-        log.info("=================================create post");
-
         String title = environment.getArgument("title");
-
-        log.info("=================================create post save");
-
         String content = environment.getArgument("content");
-
-        log.info("=================================create post save");
-
         String authorStr = environment.getArgument("author_seq");
 
-        log.info("=================================create post save");
-
         Long authorSeq = Long.valueOf(authorStr);
-
-        log.info("=================================create post save");
 
         Post post = postService.save(title,content,authorSeq);
         ResultApi<Post> result = new ResultApi<>();

@@ -2,6 +2,7 @@ package com.monee.utill;
 
 
 
+import com.monee.pool.ObjectPool;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +29,11 @@ public class PasswordEncoderTest {
         log.info("encoded password, password : "+BCrypt.checkpw(password,encodedPassword));
 
 
+    }
+
+    @Test
+    void test(){
+        ObjectPool.getInstance();
     }
 
 }

@@ -23,6 +23,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +32,10 @@ import java.io.IOException;
 import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 
 
-public class AccountServiceGraphQLProvider implements AccountServiceGraphQL {
+public class ServiceGraphQLProvider implements ServiceGraphQL {
 
+    private static Logger log = LoggerFactory.getLogger(ServiceGraphQLProvider.class);
+    
     private final AccountDao accountDao;
     private final AllAccountDataFetcher allAccountDataFetcher;
     private final AccountDataFetcher accountDataFetcher;
@@ -50,7 +54,7 @@ public class AccountServiceGraphQLProvider implements AccountServiceGraphQL {
     private final LikePostDataFetcher likePostDataFetcher;
     private GraphQL graphQL;
 
-    public AccountServiceGraphQLProvider(AccountDao accountDao, AllAccountDataFetcher allAccountDataFetcher, AccountDataFetcher accountDataFetcher, CreateAccountDataFetcher createAccountDataFetcher, UpdateAccountDataFetcher updateAccountDataFetcher, PostDataFetcher postDataFetcher, AllPostDataFetcher allPostDataFetcher, CreatePostDataFetcher createPostDataFetcher, UpdatePostDataFetcher updatePostDataFetcher, DeletePostDataFetcher deletePostDataFetcher, AllReplyDataFetcher allReplyDataFetcher, CreateReplyDataFetcher createReplyDataFetcher, DeleteReplyDataFetcher deleteReplyDataFetcher, ReplyDataFetcher replyDataFetcher, UpdateReplyDataFetcher updateReplyDataFetcher, LikePostDataFetcher likePostDataFetcher) {
+    public ServiceGraphQLProvider(AccountDao accountDao, AllAccountDataFetcher allAccountDataFetcher, AccountDataFetcher accountDataFetcher, CreateAccountDataFetcher createAccountDataFetcher, UpdateAccountDataFetcher updateAccountDataFetcher, PostDataFetcher postDataFetcher, AllPostDataFetcher allPostDataFetcher, CreatePostDataFetcher createPostDataFetcher, UpdatePostDataFetcher updatePostDataFetcher, DeletePostDataFetcher deletePostDataFetcher, AllReplyDataFetcher allReplyDataFetcher, CreateReplyDataFetcher createReplyDataFetcher, DeleteReplyDataFetcher deleteReplyDataFetcher, ReplyDataFetcher replyDataFetcher, UpdateReplyDataFetcher updateReplyDataFetcher, LikePostDataFetcher likePostDataFetcher) {
         this.accountDao = accountDao;
         this.allAccountDataFetcher = allAccountDataFetcher;
         this.accountDataFetcher = accountDataFetcher;
@@ -70,28 +74,20 @@ public class AccountServiceGraphQLProvider implements AccountServiceGraphQL {
     }
 
     public ExecutionResult execute(String query){
-        System.out.println("AccountServiceGraphQLProvider execute=====================");
+        log.info("AccountServiceGraphQLProvider execute");
         return graphQL.execute(query);
     }
 
     public void loadSchema() throws IOException {
 
-        System.out.println("AccountServiceGraphQLProvider load schema=====================");
+        log.info("AccountServiceGraphQLProvider load schema");
 
         try{
 
             File schemaFile = new File("C:\\Users\\kjuio\\IdeaProjects\\monee_lab_assignment\\src\\main\\resources\\graphql\\" + "schema.graphqls");
 
-            System.out.println("schema : " + schemaFile);
-
             SchemaParser schemaParser = new SchemaParser();
             TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaFile);
-
-            System.out.println("typeDefinitionRegistry account : " + typeDefinitionRegistry.getType("Account"));
-            System.out.println("typeDefinitionRegistry post : " + typeDefinitionRegistry.getType("Post"));
-            System.out.println("typeDefinitionRegistry reply : " + typeDefinitionRegistry.getType("Reply"));
-            System.out.println("typeDefinitionRegistry role : " + typeDefinitionRegistry.getType("Role"));
-            System.out.println("typeDefinitionRegistry query : " + typeDefinitionRegistry.getType("Query"));
 
             RuntimeWiring runtimeWiring = newRuntimeWiring()
                     .type("Query", builder -> builder
@@ -122,7 +118,7 @@ public class AccountServiceGraphQLProvider implements AccountServiceGraphQL {
             this.graphQL = build;
         } catch(Exception e) {
             e.printStackTrace();
-            System.out.println("스키마 오류");
+            log.info("스키마 오류");
         }
     }
 

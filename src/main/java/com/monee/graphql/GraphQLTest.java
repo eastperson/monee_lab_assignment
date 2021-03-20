@@ -54,7 +54,7 @@ public class GraphQLTest {
         ReplyDataFetcher replyDataFetcher = new ReplyDataFetcher(replyService);
         UpdateReplyDataFetcher updateReplyDataFetcher = new UpdateReplyDataFetcher(replyService);
 
-        AccountServiceGraphQLProvider accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(accountDao, allAccountDataFetcher, accountDataFetcher, createAccountDataFetcher, updateAccountDataFetcher,
+        ServiceGraphQLProvider accountServiceGraphQLProvider = new ServiceGraphQLProvider(accountDao, allAccountDataFetcher, accountDataFetcher, createAccountDataFetcher, updateAccountDataFetcher,
                 postDataFetcher, allPostDataFetcher, createPostDataFetcher, updatePostDataFetcher, deletePostDataFetcher
                 , allReplyDataFetcher, createReplyDataFetcher, deleteReplyDataFetcher, replyDataFetcher, updateReplyDataFetcher,likePostDataFetcher);
         accountServiceGraphQLProvider.loadSchema();

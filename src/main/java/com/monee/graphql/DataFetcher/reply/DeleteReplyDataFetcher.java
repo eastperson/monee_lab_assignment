@@ -21,7 +21,7 @@ public class DeleteReplyDataFetcher implements DataFetcher<ResultApi<Reply>> {
     @Override
     public ResultApi<Reply> get(DataFetchingEnvironment environment) throws Exception {
 
-        log.info("===================delete");
+        log.info("delete");
 
         String seqStr = environment.getArgument("seq");
         Long seq = Long.valueOf(seqStr);

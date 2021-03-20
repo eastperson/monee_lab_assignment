@@ -92,14 +92,4 @@ public class geaphqlTest {
 
         log.info(executionResult.getData().toString());
     }
-
-//    private static GraphQLSchema buildSchema(){
-//        AccountDao accountDao = new AccountDao();
-//        return SchemaParser
-//                .newParser()
-//                .file("schema.graphqls")
-//                .resolvers(new Query(accountDao))
-//                .build().makeExecutableSchema();
-//    }
-
 }

@@ -40,7 +40,7 @@ public class AllReplyDataFetcher implements DataFetcher<ResultApi<List<Reply>>> 
             return result;
         }
 
-        log.info("=======================all reply");
+        log.info("all reply");
         result.setStatus(ResultApi.statusCode.OK);
         result.setSuccess(true);
         result.setData(replyService.findAll());

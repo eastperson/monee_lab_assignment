@@ -94,9 +94,9 @@ type Query {
     (결과)계정
     """
     Account(seq : ID) : ResultApiWithAccount!
-    allAccounts(title:String,content:String) : ResultApiWithAllAccount!
+    allAccounts(email:String,nickname:String) : ResultApiWithAllAccount!
     Post(seq : ID!) : ResultApiWithPost!
-    allPosts : ResultApiWithAllPosts!
+    allPosts(title:String,content:String) : ResultApiWithAllPosts!
     Reply(seq : ID!) : ResultApiWithReply!
     allReplys(post_seq:String) : ResultApiWithAllReplys!
 }

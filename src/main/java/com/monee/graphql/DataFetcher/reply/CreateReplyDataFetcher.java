@@ -22,24 +22,16 @@ public class CreateReplyDataFetcher implements DataFetcher<ResultApi<Reply>> {
     @Override
     public ResultApi<Reply> get(DataFetchingEnvironment environment) throws Exception {
 
-        log.info("======================create reply");
+        log.info("create reply");
 
         String authorSeqStr = environment.getArgument("author_seq");
-        log.info("======================create reply");
         Long authorSeq = Long.valueOf(authorSeqStr);
-        log.info("======================create reply");
         String postSeqStr = environment.getArgument("post_seq");
-        log.info("======================create reply");
         Long postSeq = Long.valueOf(postSeqStr);
-        log.info("======================create reply");
         String content = environment.getArgument("content");
-        log.info("======================create reply");
 
         Reply newReply = replyService.save(authorSeq,postSeq,content);
-        log.info("======================create reply");
-        log.info("======================create new reply : " + newReply);
         Reply reply = replyService.findByIdWithAccount(newReply.getSeq());
-        log.info("======================create reply");
         ResultApi<Reply> result = new ResultApi<>();
 
         if(reply != null){

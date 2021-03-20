@@ -22,7 +22,7 @@ public class AllAccountDataFetcher implements DataFetcher<ResultApi<List<Account
 
     @Override
     public ResultApi<List<Account>> get(DataFetchingEnvironment environment) throws Exception {
-        log.info("all account data=================================");
+        log.info("all account data");
         ResultApi<List<Account>> result = new ResultApi<>();
         result.setStatus(ResultApi.statusCode.OK);
         result.setSuccess(true);

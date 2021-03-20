@@ -1,8 +1,5 @@
 package com.monee.dao;
 
-import com.google.protobuf.Empty;
-import com.monee.controller.handler.ControllerHandler;
-import com.monee.model.Account;
 import com.monee.model.Post;
 import com.monee.pool.ObjectPool;
 import org.slf4j.Logger;
@@ -19,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.monee.utils.DateTimeUtils.dateTimeOf;
 import static com.monee.utils.DateTimeUtils.timestampOf;
@@ -87,7 +83,6 @@ public class PostDao {
                 log.info("find by seq conn : " + this.conn);
 
                 pstmt.setLong(1, seq);
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -123,10 +118,9 @@ public class PostDao {
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                log.info("find by seq conn : " + this.conn);
+                log.info("find by with account conn : " + this.conn);
 
                 pstmt.setLong(1, seq);
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -164,7 +158,7 @@ public class PostDao {
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                log.info("find by seq conn : " + this.conn);
+                log.info("find by with reply list seq conn : " + this.conn);
 
                 pstmt.setLong(1, seq);
                 log.info("pass");
@@ -277,14 +271,12 @@ public class PostDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                log.info("save conn : " + this.conn);
+                log.info("update title conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setString(1, title);
                 pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
                 pstmt.setLong(3, seq);
-
-                log.info("pass");
 
                 int result = pstmt.executeUpdate();
 
@@ -308,14 +300,12 @@ public class PostDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                log.info("save conn : " + this.conn);
+                log.info("update content conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setString(1, content);
                 pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
                 pstmt.setLong(3, seq);
-
-                log.info("pass");
 
                 int result = pstmt.executeUpdate();
 
@@ -339,12 +329,10 @@ public class PostDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                log.info("save conn : " + this.conn);
+                log.info("delete conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setLong(1, seq);
-
-                log.info("pass");
 
                 int result = pstmt.executeUpdate();
 
@@ -368,12 +356,10 @@ public class PostDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                log.info("save conn : " + this.conn);
+                log.info("add revw cnt conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setLong(1, seq);
-
-                log.info("pass");
 
                 int result = pstmt.executeUpdate();
 
@@ -402,10 +388,9 @@ public class PostDao {
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                log.info("find by seq conn : " + this.conn);
+                log.info("find by seq with all conn : " + this.conn);
 
                 pstmt.setLong(1, seq);
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -416,7 +401,7 @@ public class PostDao {
                     post.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
                     post.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
                     post.setReplyList(pool.getReplyDao().findByPostId(post.getSeq()));
-                    post.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
+                    post.setAuthor(pool.getAccountDao().findById(rs.getLong("author_seq")).get());
                 }
 
                 return Optional.of(post);
@@ -427,6 +412,95 @@ public class PostDao {
                 return Optional.empty();
 
             }
+        }
+    }
+
+    public int deleteLikes(Long postSeq) {
+
+        ObjectPool pool = ObjectPool.getInstance();
+
+        String query = "DELETE FROM likes WHERE post_seq = (?)";
+
+        Post post = null;
+
+        synchronized (ReplyDao.class) {
+
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("delete like by post seq conn : " + this.conn);
+
+                pstmt.setLong(1, postSeq);
+
+                int result = pstmt.executeUpdate();
+
+                return result;
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return -1;
+
+            }
+        }
+    }
+
+    public int deleteReplys(Long seq) {
+
+        ObjectPool pool = ObjectPool.getInstance();
+
+        String query = "DELETE FROM replys WHERE post_seq = (?)";
+
+        Post post = null;
+
+        synchronized (ReplyDao.class) {
+
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("delete replys by post seq conn : " + this.conn);
+
+                pstmt.setLong(1, seq);
+
+                int result = pstmt.executeUpdate();
+
+                return result;
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return -1;
+
+            }
+        }
+    }
+
+    public int deleteRelation(Long postSeq) throws SQLException{
+
+        String query = "DELETE FROM posts_replys WHERE post_seq = (?)";
+
+        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            PreparedStatement preparedStatement= connection.prepareStatement(query);)
+        {
+            log.info("delete relation conn : " + this.conn);
+
+            this.pstmt = preparedStatement;
+            pstmt.setLong(1,postSeq);
+
+            int result = pstmt.executeUpdate();
+
+            return result;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return -1;
+
         }
     }
 }

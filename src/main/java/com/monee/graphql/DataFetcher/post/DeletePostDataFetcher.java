@@ -20,8 +20,6 @@ public class DeletePostDataFetcher implements DataFetcher<ResultApi> {
     @Override
     public ResultApi<Post> get(DataFetchingEnvironment environment) throws Exception {
 
-        log.info("===================delete");
-
         String seqStr = environment.getArgument("seq");
         Long seq = Long.valueOf(seqStr);
 

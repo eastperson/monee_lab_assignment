@@ -1,13 +1,19 @@
 package com.monee.service;
 
+import com.monee.controller.api.PostApiController;
 import com.monee.dao.ReplyDao;
 import com.monee.model.Post;
 import com.monee.model.Reply;
+import com.monee.pool.ObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class ReplyService {
+
+    private static Logger log = LoggerFactory.getLogger(ReplyService.class);
 
     private ReplyDao replyDao;
 
@@ -34,6 +40,14 @@ public class ReplyService {
     public Reply save(Long accountSeq,Long postSeq,String content) throws SQLException {
         Reply reply = new Reply(content);
 
+        try{
+            if(ObjectPool.getInstance().getPostService().findById(postSeq) == null) throw new NullPointerException("not found post");
+        } catch (NullPointerException ne) {
+            ne.printStackTrace();
+            log.error(ne.getMessage());
+            return null;
+        }
+
         return replyDao.save(accountSeq,postSeq,reply).orElseThrow(NullPointerException::new);
     }
 
@@ -45,9 +59,14 @@ public class ReplyService {
     }
 
     public boolean delete(Long seq) throws  SQLException{
+        deleteRelation(seq);
         int result = replyDao.delete(seq);
 
         return result > 0;
+    }
+
+    public boolean deleteRelation(Long seq) throws SQLException {
+        return replyDao.deleteRelation(seq) > 0;
     }
 
 

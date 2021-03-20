@@ -1,8 +1,6 @@
 package com.monee.dao;
 
-import com.monee.controller.handler.ControllerHandler;
 import com.monee.model.Account;
-import com.monee.pool.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +69,6 @@ public class AccountDao{
                 log.info("seq : " + seq);
 
                 pstmt.setLong(1, seq);
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -104,8 +101,6 @@ public class AccountDao{
                 this.pstmt = preparedStatement;
 
                 log.info("find all conn : " + this.conn);
-
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 

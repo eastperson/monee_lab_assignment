@@ -1,7 +1,11 @@
 package com.monee.controller;
 
 import com.monee.CoreApplication;
+import com.monee.model.Reply;
+import com.monee.pool.ObjectPool;
+import com.monee.service.ReplyService;
 import com.sun.net.httpserver.HttpServer;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +22,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -56,31 +62,7 @@ public class ReplyControllerTest {
         con.setRequestProperty("Authorization","Bearer " + TOKEN);
 
         // 리퀘스트 바디 등록
-        con.setDoOutput(true);
-        OutputStream os = con.getOutputStream();
-        os.write(query.getBytes("euc-kr"));
-        os.flush();
-        os.close();
-
-        // 리스폰스 바디 등록
-        //con.setDoInput(true);
-        BufferedReader br = null;
-        String responseBody = "";
-        if (100 <= con.getResponseCode() && con.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        } else {
-            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        }
+        String responseBody = getResponseBody(query, con);
 
         int responseCode = con.getResponseCode();
         String responseMsg= con.getResponseMessage();
@@ -111,31 +93,7 @@ public class ReplyControllerTest {
         con.setRequestProperty("Authorization","Bearer " + TOKEN);
 
         // 리퀘스트 바디 등록
-        con.setDoOutput(true);
-        OutputStream os = con.getOutputStream();
-        os.write(query.getBytes("euc-kr"));
-        os.flush();
-        os.close();
-
-        // 리스폰스 바디 등록
-        //con.setDoInput(true);
-        BufferedReader br = null;
-        String responseBody = "";
-        if (100 <= con.getResponseCode() && con.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        } else {
-            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        }
+        String responseBody = getResponseBody(query, con);
 
         int responseCode = con.getResponseCode();
         String responseMsg= con.getResponseMessage();
@@ -166,31 +124,7 @@ public class ReplyControllerTest {
         con.setRequestProperty("Authorization","Bearer " + TOKEN);
 
         // 리퀘스트 바디 등록
-        con.setDoOutput(true);
-        OutputStream os = con.getOutputStream();
-        os.write(query.getBytes("euc-kr"));
-        os.flush();
-        os.close();
-
-        // 리스폰스 바디 등록
-        //con.setDoInput(true);
-        BufferedReader br = null;
-        String responseBody = "";
-        if (100 <= con.getResponseCode() && con.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        } else {
-            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        }
+        String responseBody = getResponseBody(query, con);
 
         int responseCode = con.getResponseCode();
         String responseMsg= con.getResponseMessage();
@@ -221,31 +155,7 @@ public class ReplyControllerTest {
         con.setRequestProperty("Authorization","Bearer " + TOKEN);
 
         // 리퀘스트 바디 등록
-        con.setDoOutput(true);
-        OutputStream os = con.getOutputStream();
-        os.write(query.getBytes("euc-kr"));
-        os.flush();
-        os.close();
-
-        // 리스폰스 바디 등록
-        //con.setDoInput(true);
-        BufferedReader br = null;
-        String responseBody = "";
-        if (100 <= con.getResponseCode() && con.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        } else {
-            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        }
+        String responseBody = getResponseBody(query, con);
 
         int responseCode = con.getResponseCode();
         String responseMsg= con.getResponseMessage();
@@ -276,31 +186,7 @@ public class ReplyControllerTest {
         con.setRequestProperty("Authorization","Bearer " + TOKEN);
 
         // 리퀘스트 바디 등록
-        con.setDoOutput(true);
-        OutputStream os = con.getOutputStream();
-        os.write(query.getBytes("euc-kr"));
-        os.flush();
-        os.close();
-
-        // 리스폰스 바디 등록
-        //con.setDoInput(true);
-        BufferedReader br = null;
-        String responseBody = "";
-        if (100 <= con.getResponseCode() && con.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        } else {
-            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            String strCurrentLine;
-            while ((strCurrentLine = br.readLine()) != null) {
-                responseBody += strCurrentLine;
-                log.info(strCurrentLine);
-            }
-        }
+        String responseBody = getResponseBody(query, con);
 
         int responseCode = con.getResponseCode();
         String responseMsg= con.getResponseMessage();
@@ -316,9 +202,14 @@ public class ReplyControllerTest {
 
     @DisplayName("GraphQL - delete reply - 성공")
     @Test
-    void graphql_delete_correct() throws IOException {
+    void graphql_delete_correct() throws IOException, SQLException {
 
-        String query = "{\"query\": \"mutation{deleteReply(seq:34){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
+        List<Reply> list = ObjectPool.getInstance().getReplyService().findAll();
+        Reply reply = list.get(list.size()-1);
+
+        log.info("**************************************************************2");
+
+        String query = "{\"query\": \"mutation{deleteReply(seq:"+reply.getSeq()+"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/reply");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -329,7 +220,22 @@ public class ReplyControllerTest {
         con.setRequestProperty("Content-Length",String.valueOf(query.length()));
         con.setRequestProperty("Accept","application/json");
         con.setRequestProperty("Authorization","Bearer " + TOKEN);
+        String responseBody = getResponseBody(query, con);
 
+        int responseCode = con.getResponseCode();
+        String responseMsg= con.getResponseMessage();
+
+
+        log.info("response code : " + responseCode);
+        log.info("reponse msg : " + responseMsg);
+        log.info("response body : " + responseBody);
+
+        assertTrue(responseCode == 200);
+        log.info("test complete");
+    }
+
+    @NotNull
+    private String getResponseBody(String query, HttpURLConnection con) throws IOException {
         // 리퀘스트 바디 등록
         con.setDoOutput(true);
         OutputStream os = con.getOutputStream();
@@ -342,7 +248,7 @@ public class ReplyControllerTest {
         BufferedReader br = null;
         String responseBody = "";
         if (100 <= con.getResponseCode() && con.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
+            br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
             String strCurrentLine;
             while ((strCurrentLine = br.readLine()) != null) {
                 responseBody += strCurrentLine;
@@ -356,17 +262,7 @@ public class ReplyControllerTest {
                 log.info(strCurrentLine);
             }
         }
-
-        int responseCode = con.getResponseCode();
-        String responseMsg= con.getResponseMessage();
-
-
-        log.info("response code : " + responseCode);
-        log.info("reponse msg : " + responseMsg);
-        log.info("response body : " + responseBody);
-
-        assertTrue(responseCode == 200);
-        log.info("test complete");
+        return responseBody;
     }
 
     @AfterEach

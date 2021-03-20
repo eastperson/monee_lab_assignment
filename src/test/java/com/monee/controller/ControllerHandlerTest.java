@@ -1,6 +1,6 @@
 package com.monee.controller;
 
-import com.monee.controller.handler.ControllerHandler;
+import com.monee.trash.ControllerHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

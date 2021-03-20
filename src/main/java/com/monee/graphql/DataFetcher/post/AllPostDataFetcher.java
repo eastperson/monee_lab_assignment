@@ -23,7 +23,7 @@ public class AllPostDataFetcher implements DataFetcher<ResultApi<List<Post>>> {
 
     @Override
     public ResultApi<List<Post>> get(DataFetchingEnvironment dataFetchingEnvironment) throws Exception {
-        log.info("=======================all post");
+        log.info("all post");
         ResultApi result = new ResultApi();
         result.setStatus(ResultApi.statusCode.OK);
         result.setSuccess(true);

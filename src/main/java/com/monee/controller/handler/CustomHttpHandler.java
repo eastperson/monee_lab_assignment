@@ -1,11 +1,10 @@
-package com.monee.annotation.controller;
+package com.monee.controller.handler;
 
-import com.monee.controller.AccountApiController;
-import com.monee.controller.PostApiController;
-import com.monee.controller.ReplyApiController;
+import com.monee.controller.api.AccountApiController;
+import com.monee.controller.api.PostApiController;
+import com.monee.controller.api.ReplyApiController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.eclipse.jetty.http.HttpParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,7 @@ public class CustomHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        log.info("custom handler============================================");
+        log.info("custom http handler");
 
         Object[] controllerPool = new Object[]{
                 new AccountApiController(),

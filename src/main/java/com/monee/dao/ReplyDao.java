@@ -54,7 +54,7 @@ public class ReplyDao {
                 DB_USER,
                 DB_PASSWORD)){
             this.conn = conn;
-            System.out.println("connection 생성 : "+conn);
+            log.info("connection 생성 : "+conn);
 
         }catch(Exception e) {
             fail(e.getMessage());
@@ -74,10 +74,9 @@ public class ReplyDao {
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                System.out.println("find by seq conn : " + this.conn);
+                log.info("find by seq conn : " + this.conn);
 
                 pstmt.setLong(1, seq);
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -112,10 +111,9 @@ public class ReplyDao {
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                System.out.println("find by seq conn : " + this.conn);
+                log.info("find by seq with all conn : " + this.conn);
 
                 pstmt.setLong(1, seq);
-                System.out.println("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -151,10 +149,9 @@ public class ReplyDao {
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                System.out.println("find by seq conn : " + this.conn);
+                log.info("find by post id conn : " + this.conn);
 
                 pstmt.setLong(1, postSeq);
-                System.out.println("pass");
 
                 rs = pstmt.executeQuery();
 
@@ -193,9 +190,7 @@ public class ReplyDao {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
 
-                System.out.println("find all conn : " + this.conn);
-
-                System.out.println("pass");
+                log.info("find all conn : " + this.conn);
 
                 rs = pstmt.executeQuery();
 
@@ -227,17 +222,16 @@ public class ReplyDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);) {
-                System.out.println("save conn : " + this.conn);
+                log.info("save conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setString(1, reply.getContent());
                 pstmt.setLong(2, postSeq);
                 pstmt.setLong(3, accountSeq);
-                System.out.println("pass");
-                System.out.println("meta data : " + pstmt.getParameterMetaData());
+                log.info("meta data : " + pstmt.getParameterMetaData());
 
                 int result = pstmt.executeUpdate();
-                System.out.println("저장한 개수 " + result);
+                log.info("저장한 개수 " + result);
 
                 rs = pstmt.getGeneratedKeys();
 
@@ -245,7 +239,7 @@ public class ReplyDao {
 
                 if (rs.next()) {
                     Long key = rs.getLong(1);
-                    System.out.println(key);
+                    log.info("key : "+key);
                     newReply = findById(key);
                     updatePostWithReply(postSeq, key);
                     postDao.addRevwCnt(postSeq);
@@ -271,17 +265,14 @@ public class ReplyDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                System.out.println("save conn : " + this.conn);
+                log.info("update post with reply : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setLong(1, postSeq);
                 pstmt.setLong(2, replySeq);
 
-                System.out.println("pass");
-                System.out.println("meta data : " + pstmt.getParameterMetaData());
-
                 int result = pstmt.executeUpdate();
-                System.out.println("저장한 개수 " + result);
+
 
             } catch (Exception e) {
 
@@ -299,14 +290,12 @@ public class ReplyDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                System.out.println("save conn : " + this.conn);
+                log.info("update content conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setString(1, content);
                 pstmt.setTimestamp(2, timestampOf(LocalDateTime.now()));
                 pstmt.setLong(3, seq);
-
-                System.out.println("pass");
 
                 int result = pstmt.executeUpdate();
 
@@ -332,13 +321,10 @@ public class ReplyDao {
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                System.out.println("save conn : " + this.conn);
+                log.info("reply delete conn : " + this.conn);
 
                 this.pstmt = preparedStatement;
                 pstmt.setLong(1, seq);
-
-                System.out.println("pass");
-
 
                 int result = pstmt.executeUpdate();
 
@@ -365,12 +351,10 @@ public class ReplyDao {
         try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
             PreparedStatement preparedStatement= connection.prepareStatement(query);)
         {
-            System.out.println("save conn : " + this.conn);
+            log.info("delete relation conn : " + this.conn);
 
             this.pstmt = preparedStatement;
             pstmt.setLong(1,replySeq);
-
-            System.out.println("pass");
 
             int result = pstmt.executeUpdate();
 

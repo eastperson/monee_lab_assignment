@@ -1,8 +1,8 @@
-package com.monee.controller;
+package com.monee.controller.api;
 
-import com.monee.annotation.controller.ApiController;
-import com.monee.annotation.controller.ControllerMapping;
-import com.monee.graphql.AccountServiceGraphQLProvider;
+import com.monee.controller.annotation.ApiController;
+import com.monee.controller.annotation.ControllerMapping;
+import com.monee.graphql.ServiceGraphQLProvider;
 import com.monee.pool.ObjectPool;
 import com.monee.utils.ResponseEntity;
 import graphql.ExecutionResult;
@@ -18,14 +18,11 @@ public class ReplyApiController {
 
     private static Logger log = LoggerFactory.getLogger(ReplyApiController.class);
 
-    private AccountServiceGraphQLProvider accountServiceGraphQLProvider;
+    private ServiceGraphQLProvider accountServiceGraphQLProvider;
 
     public ReplyApiController()  {
         ObjectPool pool = ObjectPool.getInstance();
-        this.accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(pool.getAccountDao(),pool.getAllAccountDataFetcher()
-                ,pool.getAccountDataFetcher(),pool.getCreateAccountDataFetcher(),pool.getUpdateAccountDataFetcher(),pool.getPostDataFetcher(),pool.getAllPostDataFetcher()
-                ,pool.getCreatePostDataFetcher(),pool.getUpdatePostDataFetcher(),pool.getDeletePostDataFetcher(),pool.getAllReplyDataFetcher(),pool.getCreateReplyDataFetcher()
-                ,pool.getDeleteReplyDataFetcher(),pool.getReplyDataFetcher(),pool.getUpdateReplyDataFetcher(),pool.getLikePostDataFetcher());
+        this.accountServiceGraphQLProvider = pool.getAccountServiceGraphQLProvider();
         try {
             accountServiceGraphQLProvider.loadSchema();
             log.info("generate complete");
@@ -38,7 +35,7 @@ public class ReplyApiController {
     @ControllerMapping(value = "/api/reply", method = "POST", responseType = "application/json")
     public ResponseEntity<String> response(Map<String, List<String>> params, Map<String,String> payload){
 
-        log.info("============================reply api controller");
+        log.info("reply api controller");
 
         String query = payload.get("query");
         ExecutionResult execute = this.accountServiceGraphQLProvider.execute(query);

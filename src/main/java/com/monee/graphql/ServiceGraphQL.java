@@ -2,7 +2,7 @@ package com.monee.graphql;
 
 import graphql.ExecutionResult;
 
-public interface AccountServiceGraphQL {
+public interface ServiceGraphQL {
 
     ExecutionResult execute(String query);
 

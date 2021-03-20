@@ -1,5 +1,9 @@
 package com.monee.db;
 
+import com.monee.dao.ReplyDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,6 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseConnector {
+
+    private static Logger log = LoggerFactory.getLogger(DatabaseConnector.class);
 
     public static void main(String... args) throws Exception {
 
@@ -34,9 +40,9 @@ public class DatabaseConnector {
                 current = rs.getString(1);
             }
 
-            System.out.println("current time : "+current);
+            log.info("current time : "+current);
 
-            System.out.println("JDBC 테스트 완료");
+            log.info("JDBC 테스트 완료");
 
         } catch (Exception e) {
 

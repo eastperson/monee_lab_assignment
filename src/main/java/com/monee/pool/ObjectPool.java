@@ -1,9 +1,11 @@
 package com.monee.pool;
 
+import com.google.gson.Gson;
 import com.monee.Filter.LoginFilter;
-import com.monee.annotation.controller.CustomHttpHandler;
-import com.monee.controller.handler.ControllerHandler;
-import com.monee.controller.handler.RestControllerHandler;
+import com.monee.controller.handler.CustomHttpHandler;
+import com.monee.graphql.ServiceGraphQLProvider;
+import com.monee.trash.ControllerHandler;
+import com.monee.trash.RestControllerHandler;
 import com.monee.dao.AccountDao;
 import com.monee.dao.LikeDao;
 import com.monee.dao.PostDao;
@@ -56,6 +58,8 @@ public class ObjectPool {
     private UpdateReplyDataFetcher updateReplyDataFetcher;
     private LoginFilter loginFilter;
     private CustomHttpHandler customHttpHandler;
+    private ServiceGraphQLProvider accountServiceGraphQLProvider;
+    private Gson gson;
 
     public static ObjectPool getInstance(){
         if(objectPool == null) {
@@ -76,6 +80,7 @@ public class ObjectPool {
         this.accountDao = new AccountDao();
         this.postDao = new PostDao(accountDao);
         this.replyDao = new ReplyDao(accountDao,postDao);
+
         this.likeDao = new LikeDao();
         this.accountService = new AccountService(accountDao);
         this.postService = new PostService(postDao,likeDao);
@@ -103,10 +108,31 @@ public class ObjectPool {
         this.updateReplyDataFetcher = new UpdateReplyDataFetcher(replyService);
         this.loginFilter = new LoginFilter();
         this.customHttpHandler = new CustomHttpHandler();
+        this.accountServiceGraphQLProvider = new ServiceGraphQLProvider(getAccountDao(),getAllAccountDataFetcher()
+                ,getAccountDataFetcher(),getCreateAccountDataFetcher(),getUpdateAccountDataFetcher(),getPostDataFetcher(),getAllPostDataFetcher()
+                ,getCreatePostDataFetcher(),getUpdatePostDataFetcher(),getDeletePostDataFetcher(),getAllReplyDataFetcher(),getCreateReplyDataFetcher()
+                ,getDeleteReplyDataFetcher(),getReplyDataFetcher(),getUpdateReplyDataFetcher(),getLikePostDataFetcher());
+        this.gson = new Gson();
+    }
+
+    public Gson getGson() {
+        return gson;
+    }
+
+    public void setGson(Gson gson) {
+        this.gson = gson;
     }
 
     public CustomHttpHandler getCustomHttpHandler() {
         return customHttpHandler;
+    }
+
+    public ServiceGraphQLProvider getAccountServiceGraphQLProvider() {
+        return accountServiceGraphQLProvider;
+    }
+
+    public void setAccountServiceGraphQLProvider(ServiceGraphQLProvider accountServiceGraphQLProvider) {
+        this.accountServiceGraphQLProvider = accountServiceGraphQLProvider;
     }
 
     public void setCustomHttpHandler(CustomHttpHandler customHttpHandler) {

@@ -1,4 +1,4 @@
-package com.monee.annotation.controller;
+package com.monee.controller.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

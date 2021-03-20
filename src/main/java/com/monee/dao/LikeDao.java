@@ -1,7 +1,5 @@
 package com.monee.dao;
 
-import com.monee.controller.handler.ControllerHandler;
-import com.monee.model.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,10 +7,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Optional;
-
-import static com.monee.utils.DateTimeUtils.dateTimeOf;
 
 public class LikeDao {
 
@@ -38,19 +32,20 @@ public class LikeDao {
 
         String query = "INSERT INTO likes (account_seq,post_seq) VALUES(?,?);";
 
+        synchronized (LikeDao.class) {
+
             try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);)
             {
                 this.conn = connection;
                 this.pstmt = preparedStatement;
-                log.info("find by seq conn : " + this.conn);
+                log.info("like add: " + this.conn);
 
                 pstmt.setLong(1,accountSeq);
                 pstmt.setLong(2,postSeq);
-                log.info("pass");
 
                 int rs = pstmt.executeUpdate();
-                log.info("rs : " + rs);
+                log.info("like add rs : " + rs);
 
                 return rs == 1;
 
@@ -59,31 +54,35 @@ public class LikeDao {
                 e.printStackTrace();
                 return false;
             }
+        }
     }
 
     public boolean remove(Long accountSeq, Long postSeq) {
 
         String query = "DELETE FROM likes WHERE account_seq = (?) AND post_seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
 
-            pstmt.setLong(1,accountSeq);
-            pstmt.setLong(2,postSeq);
-            log.info("pass");
+        synchronized (LikeDao.class){
+            try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+                PreparedStatement preparedStatement = connection.prepareStatement(query);)
+            {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("like remove : " + this.conn);
 
-            int rs = pstmt.executeUpdate();
+                pstmt.setLong(1,accountSeq);
+                pstmt.setLong(2,postSeq);
 
-            return rs == 1;
+                int rs = pstmt.executeUpdate();
+                log.info("like remove : " + rs);
 
-        } catch (Exception e) {
+                return rs == 1;
 
-            e.printStackTrace();
-            return false;
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+            }
         }
     }
 
@@ -91,29 +90,30 @@ public class LikeDao {
 
         String query = "SELECT * FROM likes WHERE account_seq = (?) AND post_seq = (?)";
 
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement = connection.prepareStatement(query);)
-        {
-            this.conn = connection;
-            this.pstmt = preparedStatement;
-            log.info("find by seq conn : " + this.conn);
+        synchronized (LikeDao.class){
+            try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+                PreparedStatement preparedStatement = connection.prepareStatement(query);)
+            {
+                this.conn = connection;
+                this.pstmt = preparedStatement;
+                log.info("is like post seq conn : " + this.conn);
 
-            pstmt.setLong(1,accountSeq);
-            pstmt.setLong(2,postSeq);
-            log.info("pass");
+                pstmt.setLong(1,accountSeq);
+                pstmt.setLong(2,postSeq);
 
-            ResultSet rs = pstmt.executeQuery();
+                ResultSet rs = pstmt.executeQuery();
 
-            if(!rs.next()){
+                if(!rs.next()){
+                    return false;
+                }
+
+                return rs.getString("account_seq") != null && rs.getString("post_seq") != null;
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
                 return false;
             }
-
-            return rs.getString("account_seq") != null && rs.getString("post_seq") != null;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return false;
         }
     }
 }

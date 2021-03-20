@@ -20,8 +20,6 @@ public class LikePostDataFetcher implements DataFetcher<ResultApi> {
     @Override
     public ResultApi get(DataFetchingEnvironment environment) throws Exception {
 
-        log.info("======================like");
-
         String accountSeqStr = environment.getArgument("account_seq");
         String postSeqStr = environment.getArgument("post_seq");
         Boolean isAdd = (Boolean) environment.getArgument("isAdd");
@@ -42,13 +40,13 @@ public class LikePostDataFetcher implements DataFetcher<ResultApi> {
         }
 
 
-        log.info("======================like");
+        log.info("like");
         if(isAdd){
              rs = postService.addLike(accountSeq,postSeq);
-            log.info("======================like rs : " + rs);
+            log.info("like rs : " + rs);
         }else {
             rs = postService.cancleLike(accountSeq,postSeq);
-            log.info("======================like rs : " + rs);
+            log.info("like rs : " + rs);
         }
 
         if(rs) {

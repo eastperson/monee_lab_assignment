@@ -24,13 +24,13 @@ public class AccountDataFetcher implements DataFetcher<ResultApi<Account>> {
     @Override
     public ResultApi<Account> get(DataFetchingEnvironment environment) throws Exception {
 
-        log.info("account date fetcher===========");
+        log.info("account date fetcher");
         log.info(String.valueOf(environment.getArguments()));
 
         String seqStr = environment.getArgument("seq");
         Long seq = Long.valueOf(seqStr);
 
-        log.info("account date fetcher===========" + seq);
+        log.info("account date fetcher" + seq);
         Optional<Account> findById = accountDao.findById(seq);
         ResultApi<Account> result = new ResultApi<>();
         if(findById.isPresent()){

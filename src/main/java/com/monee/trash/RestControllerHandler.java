@@ -1,9 +1,9 @@
-package com.monee.controller.handler;
+package com.monee.trash;
 
 import com.google.gson.Gson;
 import com.monee.dto.AccountDto;
 import com.monee.dto.LoginResult;
-import com.monee.graphql.AccountServiceGraphQLProvider;
+import com.monee.graphql.ServiceGraphQLProvider;
 import com.monee.model.Account;
 import com.monee.pool.ObjectPool;
 import com.monee.security.Jwt;
@@ -56,7 +56,7 @@ public class RestControllerHandler implements HttpHandler  {
 
         accountService = pool.getAccountService();
 
-        AccountServiceGraphQLProvider accountServiceGraphQLProvider = new AccountServiceGraphQLProvider(pool.getAccountDao(),pool.getAllAccountDataFetcher()
+        ServiceGraphQLProvider accountServiceGraphQLProvider = new ServiceGraphQLProvider(pool.getAccountDao(),pool.getAllAccountDataFetcher()
             ,pool.getAccountDataFetcher(),pool.getCreateAccountDataFetcher(),pool.getUpdateAccountDataFetcher(),pool.getPostDataFetcher(),pool.getAllPostDataFetcher()
             ,pool.getCreatePostDataFetcher(),pool.getUpdatePostDataFetcher(),pool.getDeletePostDataFetcher(),pool.getAllReplyDataFetcher(),pool.getCreateReplyDataFetcher()
             ,pool.getDeleteReplyDataFetcher(),pool.getReplyDataFetcher(),pool.getUpdateReplyDataFetcher(),pool.getLikePostDataFetcher());

@@ -1,6 +1,6 @@
 package com.monee.annotation.controller;
 
-@RestController
+@ApiController
 public class SampleController2 {
 
     @ControllerMapping(value = "/api/sample2",method = "POST")

@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,8 +186,11 @@ public class AccountControllerTest {
         map.put("email", UUID.randomUUID().toString().substring(0,10)+"@naver.com");
         map.put("nickname","eastperson");
         map.put("password","123123");
+        Map<String,Map<String,String>> obj = new HashMap<>();
+        obj.put("request",map);
+
         Gson gson = new Gson();
-        String signupRequestJson = gson.toJson(map);
+        String signupRequestJson = gson.toJson(obj);
         log.info("login request json : " + signupRequestJson);
 
         URL url = new URL("http://localhost:8080/api/account/signup");
@@ -292,6 +296,46 @@ public class AccountControllerTest {
 
         assertTrue(responseCode == 200);
         log.info("test complete");
+    }
+
+    @Test
+    void test(){
+        TestResult testResult=  new TestResult();
+        ResultApi<Account> result = new ResultApi<>();
+        result.setStatus(200);
+        result.setSuccess(true);
+        result.setData(null);
+        testResult.setAllAccounts(result);
+
+        Gson gson = new Gson();
+
+        String str = gson.toJson(testResult);
+
+        log.info("result : "+ str);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("result","rest");
+        log.info("result2 : " + map);
+
+    }
+
+    class TestResult{
+        private ResultApi<Account> allAccounts;
+
+        public ResultApi getResult(){
+            return this.allAccounts;
+        }
+
+        public void setAllAccounts(ResultApi<Account> allAccounts) {
+            this.allAccounts = allAccounts;
+        }
+
+        @Override
+        public String toString() {
+            return "TestResult{" +
+                    "allAccounts=" + allAccounts +
+                    '}';
+        }
     }
 
     @DisplayName("GraphQL - 회원목록 실패(토큰오류)")
@@ -403,7 +447,6 @@ public class AccountControllerTest {
         assertTrue(responseCode == 200);
         log.info("test complete");
     }
-
     @DisplayName("GraphQL - 회원 찾기 by id - 실패(토큰 오류)")
     @Test
     void graphql_findById_error() throws IOException {

@@ -11,5 +11,6 @@ public @interface ControllerMapping {
 
     String value() default "/";
     String method() default "GET";
+    String responseType() default "text/html";
 
 }

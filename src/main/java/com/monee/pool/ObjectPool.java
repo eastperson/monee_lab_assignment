@@ -1,6 +1,7 @@
 package com.monee.pool;
 
 import com.monee.Filter.LoginFilter;
+import com.monee.annotation.controller.CustomHttpHandler;
 import com.monee.controller.handler.ControllerHandler;
 import com.monee.controller.handler.RestControllerHandler;
 import com.monee.dao.AccountDao;
@@ -54,6 +55,7 @@ public class ObjectPool {
     private ReplyDataFetcher replyDataFetcher;
     private UpdateReplyDataFetcher updateReplyDataFetcher;
     private LoginFilter loginFilter;
+    private CustomHttpHandler customHttpHandler;
 
     public static ObjectPool getInstance(){
         if(objectPool == null) {
@@ -100,6 +102,15 @@ public class ObjectPool {
         this.replyDataFetcher = new ReplyDataFetcher(replyService);
         this.updateReplyDataFetcher = new UpdateReplyDataFetcher(replyService);
         this.loginFilter = new LoginFilter();
+        this.customHttpHandler = new CustomHttpHandler();
+    }
+
+    public CustomHttpHandler getCustomHttpHandler() {
+        return customHttpHandler;
+    }
+
+    public void setCustomHttpHandler(CustomHttpHandler customHttpHandler) {
+        this.customHttpHandler = customHttpHandler;
     }
 
     public AccountDao getAccountDao() {

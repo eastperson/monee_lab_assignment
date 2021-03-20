@@ -207,8 +207,6 @@ public class ReplyControllerTest {
         List<Reply> list = ObjectPool.getInstance().getReplyService().findAll();
         Reply reply = list.get(list.size()-1);
 
-        log.info("**************************************************************2");
-
         String query = "{\"query\": \"mutation{deleteReply(seq:"+reply.getSeq()+"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/reply");

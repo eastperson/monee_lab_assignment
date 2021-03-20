@@ -42,6 +42,7 @@ public class ControllerHandler implements HttpHandler {
 
         String requestMethod = exchange.getRequestMethod();
         Headers headers = exchange.getRequestHeaders();
+        URI uri = exchange.getRequestURI();
 
         if (requestMethod.equalsIgnoreCase("GET")){
 
@@ -50,8 +51,6 @@ public class ControllerHandler implements HttpHandler {
             Headers responseHeaders = exchange.getResponseHeaders();
 
             responseHeaders.set("Content-Type", "text/html");
-
-            URI uri = exchange.getRequestURI();
 
             log.info("uri path : " + uri.getPath());
             log.info("uri == / " + uri.getPath().equals("/"));

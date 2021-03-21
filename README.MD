@@ -79,7 +79,7 @@ Controller를 제외한 모든 객체는 서버가 시작될 때 ObjectPool에�
 
 <h3>GraphQL API 개발 </h3>
 
-[GraphQL Schema (src\main\resources\graphql\schema.graphqls)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/graphql/schema.graphqls)
+[GraphQL Schema (src\main\resources\graphql\schema.graphqls)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/resources/graphql/schema.graphqls)<br/>
 [GraphQL Provider, DataFetcher 소스 보기 (src\main\java\com\monee\graphql)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/graphql)
 
 <p>
@@ -137,8 +137,7 @@ public Boolean login(String email, String password) throws NotFoundException {
 
 <h3>HttpURLConnection 테스트</h3>
 
-[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/controller/AccountControllerTest.java)
-
+[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/test/java/com/monee/controller/AccountControllerTest.java)
 <p>
 JUnit 환경에 API 서비스를 테스트하기 위해 HttpURLConnection을 통해 가상의 클라이언트를 생성해서 진행했다. JUnit5 환경에서 connection에 Header와 Request Body를 입력한다.
 요청에 따라 Authorization를 입력한다. 이후 커넥트를 통해 Response Body를 응답받고, 받은 내용을 JSON으로 파싱한다. status code와 success 여부를 판단하여
@@ -157,7 +156,7 @@ API 서비스를 테스트한다.
 
 <h3>Thread-Safety 테스트</h3>
 
-[전체 서비스 쓰레드 안정성 테스트 소스 보기 (src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/thread/AllServiceThreadSafetyTest.java)<br/>
+[전체 서비스 쓰레드 안정성 테스트 소스 보기 (src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)<br/>
 멀티 쓰레드 환경에서 Service가 동작하는지 확인하기 위해 쓰레드 코드를 작성해서 실행하였다. [ThreadException](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/errors/ThreadException.java)이 발생하는 경우
 Connection 오류가 발생하는 것을 확인하였고, synchronized 블럭을 사용하여 단일 커넥션을 사용하는 경우 동기화 처리를 진행시켜주었다.
 
@@ -174,7 +173,7 @@ JUnit 환경에서는 멀티 쓰레드 API 테스트가 쉽지 않았기 때문�
 
 <h3>JMeter 테스트</h3>
 
-[JMeter 결과 Summary](src\main\resources\jmeter_summary.csv) <br/>
+[JMeter 결과 Summary](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/resources/jmeter_summary.csv) <br/>
 Multi-Thread와 Stress를 검증하기 위해 JMeter를 사용하였다. 100개의 쓰레드 * 20번의 loop의 환경에서 API 서비스 테스트 및 성능 테스트를 하였다. 
 
 ![image](https://user-images.githubusercontent.com/66561524/111894553-fa847900-8a4e-11eb-9e0c-6911675c6fb3.png)

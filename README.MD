@@ -36,13 +36,13 @@ Account - 회원가입, 로그인, 비밀번호 암호화, 계정 리스트, 계
 Post - CRUD, 좋아요, 댓글 합계 (인증처리) <br/>
 Reply - CRUD (인증처리) <br/>
 
-[Service 소스 보기 (src\main\java\com\monee\service)](src\main\java\com\monee\service) <br/>
+[Service 소스 보기 (src\main\java\com\monee\service)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/service) <br/>
 <h3>ERD</h3>
 
-[DB Schema (src\main\resources\schema-mysql.sql)](src\main\resources\schema-mysql.sql) <br/>
-[Java Model 소스 보기 (src\main\java\com\monee\model)](src\main\java\com\monee\model)
+[DB Schema (src\main\resources\schema-mysql.sql)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/resources/schema-mysql.sql) <br/>
+[Java Model 소스 보기 (src\main\java\com\monee\model)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/model)
 
-![image](https://user-images.githubusercontent.com/66561524/111755024-fedc5500-88db-11eb-93d9-2da6f4f0a82f.png)
+![image](https://user-images.githubusercontent.com/66561524/111895784-2fe19480-8a58-11eb-9b02-2bfa17c1b380.png)
 <a href="https://aquerytool.com:443/aquerymain/index/?rurl=206bcb5e-ea1a-4a77-9599-43dbb58a08b4">ERD 확인(읽기 전용)</a></br>
 pw : 1jvwt8
 
@@ -50,29 +50,28 @@ pw : 1jvwt8
 
 <h3>MVC 패턴 구현</h3>
 
-[Controller 소스 보기 (src\main\java\com\monee\controller\annotation)](src\main\java\com\monee\controller) <br/>
-[Controller Annotation 소스 보기 (src\main\java\com\monee\controller\annotation)](src\main\java\com\monee\controller\annotation) <br/>
-[Service 소스 보기 (src\main\java\com\monee\service)](src\main\java\com\monee\service) <br/>
-[Object Pool 소스 보기 (src\main\java\com\monee\pool\ObjectPool.java)](src\main\java\com\monee\pool\ObjectPool.java)
+[Controller 소스 보기 (src\main\java\com\monee\controller\annotation)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/controller) <br/>
+[Controller Annotation 소스 보기 (src\main\java\com\monee\controller\annotation)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/controller/annotation) <br/>
+[Service 소스 보기 (src\main\java\com\monee\service)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/service) <br/>
+[Object Pool 소스 보기 (src\main\java\com\monee\pool\ObjectPool.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/pool/ObjectPool.java)
 
 <p>
-Spring과 같이 MVC 패턴을 구현하기 위한 제작을 하였다. Spring Bean Container와 유사한 역할을 하는 ObjectPool을 만들었고, 컨트롤러의 경우는 코드의 복잡도가 높아져
-서버의 요청을 처리해주는 로직과 파라미터를 바인딩 받아 로직을 처리하는 로직을 어노테이션을 제작하여 분리하였다. 클라이언트 요청의 흐름은 다음과 같이 구현하였다.
+Spring과 같이 MVC 패턴을 구현하기 위한 제작을 하였다. Spring Bean Container와 유사한 역할을 하는 ObjectPool을 만들었다. Controller의 경우는 코드의 복잡도가 높아져
+서버의 요청을 처리해주는 로직과 파라미터를 바인딩 받아 로직을 처리하는 로직을 어노테이션을 제작하여 분리하였다. 클라이언트 요청의 흐름은 아래와 같이 구현하였다.
 </p>
 
-<p>HtppServer를 통해 Client의 Request를 받는다. 요청의 Header와 RequestBody, URI를 읽고 Controller Pool에 있는 Controller Method와 맵핑을 한다. Controller는 
-어노테이션으로 등록된 컨트롤러와 메서드에 각 URI 마다 맵핑한다. 컨트롤러는 받은 요청의 파라미터를 바인딩해주고 Service가 처리된 로직의 결과값을 반환한다.
+<p>HtppServer를 통해 Client의 Request를 받는다. 요청의 Header와 RequestBody, URI를 읽어 Controller Pool에 있는 Controller Method와 맵핑을 한다. Controller는 
+어노테이션으로 등록된 컨트롤러와 메서드 어노테이션에 기재되어있는 URI에 맵핑한다. 컨트롤러는 받은 요청의 파라미터를 바인딩해주고 Service가 처리된 로직의 결과값을 반환한다.
 Service는 로직처리를 해주며 로직처리가 된 값은 DAO를 통해 DB와 Connect한다. </p>
 <p>
 Controller를 제외한 모든 객체는 서버가 시작될 때 ObjectPool에서 생성이 되며 싱글톤으로 구현이 되어있어, 로직을 사용할 때마다 서버에서 꺼내어 객체를 사용한다.
-
 </p>
 
 ![image](https://user-images.githubusercontent.com/66561524/111868890-e8a7c500-89bf-11eb-8e6f-dc00a7cbb439.png)
 
 <h3>DB Connection</h3>
 
-[DAO 소스 보기 (src\main\java\com\monee\dao)](src\main\java\com\monee\dao)
+[DAO 소스 보기 (src\main\java\com\monee\dao)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/dao)
 <p>
 순수 JDBC를 사용하여 DB Connection을 생성한다. 쿼리는 용도에 따라 정적으로 구현을 하였다. 커넥션을 사용하는 로직은 동기화 처리가 되어있어 멀티 쓰레드 환경에서 생기는
 오류를 방지하였다. 
@@ -80,24 +79,23 @@ Controller를 제외한 모든 객체는 서버가 시작될 때 ObjectPool에�
 
 <h3>GraphQL API 개발 </h3>
 
+[GraphQL Schema (src\main\resources\graphql\schema.graphqls)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/resources/graphql/schema.graphqls) <br/>
+[GraphQL Provider, DataFetcher 소스 보기 (src\main\java\com\monee\graphql)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/graphql)
+
 <p>
 GraphQL은 단일한 엔드 포인트에 쿼리에 따라 적절한 결과값을 반환해주는 로직을 처리한다. graphqls로 작성한 Schema에 쿼리와 기대 결과값을 작성한다. ServiceGraphQLProvider는 
 schema에서 작성한 쿼리와 이를 처리하는 DataFetcher를 작성해준다. Query와 Mutation은 로직을 구분하여 작성한다. DataFetcher는
 schema의 쿼리/뮤테이션마다 하나씩 작성하며 해당하는 데이터를 가져오는 로직을 구현한다.
 </p>
 
-<p>
-응답은 success, status code, object를 필드로 갖는 ResultApi 객체를 만들어서 반환한다. 응답 내용을 쉽게 Client에서 확인할 수 있으며 응답 객체에 따라 유연하게
-활용할 수 있도록  구성하였다. API의 엔드포인트에 따른 필요 Parameter와 기대 응답은 최하단에 기재하였다.
-</p>
 
-[GraphQL Schema (src\main\resources\graphql\schema.graphqls)](src\main\resources\graphql\schema.graphqls)
-[GraphQL Provider, DataFetcher 소스 보기 (src\main\java\com\monee\graphql)](src\main\java\com\monee\graphql)
+응답은 success, status code, object를 필드로 갖는 [ResultApi](src\main\java\com\monee\utils\ResultApi.java) 객체를 만들어서 반환한다. 응답 내용은 쉽게 Client에서 확인할 수 있으며 응답 data 객체에 따라 유연하게 활용할 수 있도록 구성하였다. API의 엔드포인트에 따른 필요 Parameter와 기대 응답은 최하단에 기재하였다.
+
 
 <h3>인증/인가</h3>
 
-[Filter 소스 보기 (src\main\java\com\monee\Filter\LoginFilter.java)](src\main\java\com\monee\Filter\LoginFilter.java)
-[JWT 소스 보기 (src\main\java\com\monee\security\Jwt.java)](src\main\java\com\monee\security\Jwt.java)
+[Filter 소스 보기 (src\main\java\com\monee\Filter\LoginFilter.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/Filter/LoginFilter.java) <br/>
+[JWT 소스 보기 (src\main\java\com\monee\security\Jwt.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/security/Jwt.java)
 
 <p>
 API 로직에 적합한 Jwt를 사용하여 로그인처리를 구현하였다. 로그인 처리가 완료되면 access_token이 발급된다. JWT 검증은 Controller 맵핑을 하기 전인 Filter를 통해 구현하였다.
@@ -111,6 +109,7 @@ API 로직에 적합한 Jwt를 사용하여 로그인처리를 구현하였다. 
 </p>
 
 ``` java
+// 로그인, JWT 발급 - AccountApiController
 if(accountService.login(email,password)){
     log.info("login success");
     Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
@@ -123,7 +122,8 @@ if(accountService.login(email,password)){
     status = 200;
     success = true;
 }
-
+...
+// 계정 존재 여부, 비밀번호 확인 로직 - AccountService
 public Boolean login(String email, String password) throws NotFoundException {
         Account account = findByEmail(email)
             .orElseThrow(() -> new NotFoundException("Could not found user for " + email));
@@ -135,10 +135,9 @@ public Boolean login(String email, String password) throws NotFoundException {
 
 <h2>3. 테스트 환경</h2>
 
-<h3>HttpURLConnection 테스트 <small><br/>
+<h3>HttpURLConnection 테스트</h3>
 
-[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](src\test\java\com\monee\controller\AccountControllerTest.java)</small></h3>
-
+[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/test/java/com/monee/controller/AccountControllerTest.java)
 <p>
 JUnit 환경에 API 서비스를 테스트하기 위해 HttpURLConnection을 통해 가상의 클라이언트를 생성해서 진행했다. JUnit5 환경에서 connection에 Header와 Request Body를 입력한다.
 요청에 따라 Authorization를 입력한다. 이후 커넥트를 통해 Response Body를 응답받고, 받은 내용을 JSON으로 파싱한다. status code와 success 여부를 판단하여
@@ -157,8 +156,8 @@ API 서비스를 테스트한다.
 
 <h3>Thread-Safety 테스트</h3>
 
-[전체 서비스 쓰레드 안정성 테스트 소스 보기 (src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)](src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)<br/>
-멀티 쓰레드 환경에서 Service가 동작하는지 확인하기 위해 쓰레드 코드를 작성해서 실행하였다. [ThreadException](src/main/java/com/monee/errors/ThreadException.java)이 발생하는 경우
+[전체 서비스 쓰레드 안정성 테스트 소스 보기 (src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)<br/>
+멀티 쓰레드 환경에서 Service가 동작하는지 확인하기 위해 쓰레드 코드를 작성해서 실행하였다. [ThreadException](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/errors/ThreadException.java)이 발생하는 경우
 Connection 오류가 발생하는 것을 확인하였고, synchronized 블럭을 사용하여 단일 커넥션을 사용하는 경우 동기화 처리를 진행시켜주었다.
 
 HttpServer는 기본적으로 ThreadPool에서 쓰레드 사용해주기 때문에 다중의 클라이언트의 접근을 인스턴스를 통해 접근할 수 있다.
@@ -174,8 +173,8 @@ JUnit 환경에서는 멀티 쓰레드 API 테스트가 쉽지 않았기 때문�
 
 <h3>JMeter 테스트</h3>
 
-[JMeter 결과 Summary](src\main\resources\jmeter_summary.csv) <br/>
-Multi-Thread와 Stress를 검증하기 위해 JMeter를 사용하였다. 100개의 쓰레드 * 20번의 loop의 환경에서 API 서비스 테스트 및 성능 테스트를 하였다. 
+[JMeter 결과 Summary](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/resources/jmeter_summary.csv) <br/>
+Multi-Thread와 Stress를 검증하기 위해 JMeter를 사용하였다. 100개의 쓰레드 * 20번의 loop의 환경에서 API 서비스 테스트 및 성능 테스트를 하였다.
 
 ![image](https://user-images.githubusercontent.com/66561524/111894553-fa847900-8a4e-11eb-9e0c-6911675c6fb3.png)
 

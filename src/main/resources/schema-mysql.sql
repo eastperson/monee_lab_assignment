@@ -52,13 +52,6 @@ CREATE TABLE Roles
 
  **/
 
-
-CREATE TABLE Posts_replys
-(
-    `Post_seq`   BIGINT    NOT NULL    COMMENT '게시글',
-    `Reply_seq`  BIGINT    NOT NULL    COMMENT '댓글'
-);
-
 CREATE TABLE Accounts_roles
 (
     `Account_seq`  BIGINT         NOT NULL    COMMENT '계정',
@@ -105,14 +98,6 @@ ALTER TABLE Accounts_roles
     ADD CONSTRAINT FK_Accounts_roles_role_Roles_role FOREIGN KEY (role)
         REFERENCES Roles (role) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-
-ALTER TABLE Posts_replys
-    ADD CONSTRAINT FK_Posts_replys_Post_seq_Posts_seq FOREIGN KEY (Post_seq)
-        REFERENCES Posts (seq) ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-ALTER TABLE Posts_replys
-    ADD CONSTRAINT FK_Posts_replys_Reply_seq_Replys_seq FOREIGN KEY (Reply_seq)
-        REFERENCES Replys (seq) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE Likes
     ADD CONSTRAINT FK_Likes_Account_seq_Accounts_seq FOREIGN KEY (Account_seq)

@@ -28,7 +28,7 @@ public class PostApiController {
             log.info("generate complete");
         } catch (IOException e) {
             e.printStackTrace();
-            log.info("generate error");
+            log.error("generate error");
         }
     }
 

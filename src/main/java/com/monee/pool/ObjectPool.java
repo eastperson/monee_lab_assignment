@@ -29,6 +29,8 @@ import com.monee.service.AccountService;
 import com.monee.service.PostService;
 import com.monee.service.ReplyService;
 
+import java.io.IOException;
+
 public class ObjectPool {
 
     private static ObjectPool objectPool = null;
@@ -112,6 +114,11 @@ public class ObjectPool {
                 ,getAccountDataFetcher(),getCreateAccountDataFetcher(),getUpdateAccountDataFetcher(),getPostDataFetcher(),getAllPostDataFetcher()
                 ,getCreatePostDataFetcher(),getUpdatePostDataFetcher(),getDeletePostDataFetcher(),getAllReplyDataFetcher(),getCreateReplyDataFetcher()
                 ,getDeleteReplyDataFetcher(),getReplyDataFetcher(),getUpdateReplyDataFetcher(),getLikePostDataFetcher());
+        try {
+            this.accountServiceGraphQLProvider.loadSchema();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.gson = new Gson();
     }
 

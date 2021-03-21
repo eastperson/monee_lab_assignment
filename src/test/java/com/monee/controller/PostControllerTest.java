@@ -73,7 +73,7 @@ public class PostControllerTest {
     @Test
     void graphql_find_by_id_correct() throws IOException {
 
-        String query = "{\"query\": \"{Post(seq:1){success,status,data{seq,title,content,revwCnt}}}\"}";
+        String query = "{\"query\": \"{Post(seq:1700){success,status,data{seq,title,content,revwCnt}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/post");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -104,7 +104,7 @@ public class PostControllerTest {
     @Test
     void graphql_findByIdWithAccount_correct() throws IOException {
 
-        String query = "{\"query\": \"{Post(seq:1){success,status,data{seq,title,content,revwCnt,author{seq,nickname,email}}}}\"}";
+        String query = "{\"query\": \"{Post(seq:1700){success,status,data{seq,title,content,revwCnt,author{seq,nickname,email}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/post");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -135,7 +135,7 @@ public class PostControllerTest {
     @Test
     void graphql_findByIdWithReplyList_correct() throws IOException {
 
-        String query = "{\"query\": \"{Post(seq:1){success,status,data{seq,title,content,revwCnt,author{nickname},replyList{seq,content,author{seq,nickname,email}}}}}\"}";
+        String query = "{\"query\": \"{Post(seq:1700){success,status,data{seq,title,content,revwCnt,author{nickname},replyList{seq,content,author{seq,nickname,email}}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/post");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();

@@ -74,13 +74,13 @@ public class ServiceGraphQLProvider implements ServiceGraphQL {
     }
 
     public ExecutionResult execute(String query){
-        log.info("AccountServiceGraphQLProvider execute");
+        log.info("ServiceGraphQLProvider execute");
         return graphQL.execute(query);
     }
 
     public void loadSchema() throws IOException {
 
-        log.info("AccountServiceGraphQLProvider load schema");
+        log.info("ServiceGraphQLProvider load schema");
 
         try{
 

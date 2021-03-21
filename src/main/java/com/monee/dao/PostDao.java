@@ -434,12 +434,8 @@ public class PostDao {
                 pstmt.setLong(1, postSeq);
 
                 int result = pstmt.executeUpdate();
-
                 return result;
-
-
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return -1;
 
@@ -466,41 +462,12 @@ public class PostDao {
                 pstmt.setLong(1, seq);
 
                 int result = pstmt.executeUpdate();
-
                 return result;
-
-
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return -1;
 
             }
-        }
-    }
-
-    public int deleteRelation(Long postSeq) throws SQLException{
-
-        String query = "DELETE FROM posts_replys WHERE post_seq = (?)";
-
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("delete relation conn : " + this.conn);
-
-            this.pstmt = preparedStatement;
-            pstmt.setLong(1,postSeq);
-
-            int result = pstmt.executeUpdate();
-
-            return result;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return -1;
-
         }
     }
 }

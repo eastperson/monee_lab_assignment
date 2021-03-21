@@ -55,10 +55,8 @@ public class ReplyDao {
                 DB_PASSWORD)){
             this.conn = conn;
             log.info("connection 생성 : "+conn);
-
         }catch(Exception e) {
             fail(e.getMessage());
-
         }
     }
 
@@ -86,11 +84,9 @@ public class ReplyDao {
                     reply.setCreateAt(dateTimeOf(rs.getTimestamp("create_at")));
                     reply.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
                 }
-
                 return Optional.of(reply);
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return Optional.empty();
 
@@ -124,11 +120,9 @@ public class ReplyDao {
                     reply.setUpdateAt(dateTimeOf(rs.getTimestamp("update_at")));
                     reply.setAuthor(accountDao.findById(rs.getLong("author_seq")).get());
                 }
-
                 return Optional.of(reply);
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return Optional.empty();
 
@@ -169,10 +163,8 @@ public class ReplyDao {
                 return list;
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return Collections.EMPTY_LIST;
-
             }
         }
     }
@@ -205,11 +197,9 @@ public class ReplyDao {
                     list.add(reply);
                 }
                 return list;
-
             } catch (Exception e) {
                 e.printStackTrace();
                 return Collections.EMPTY_LIST;
-
             }
         }
     }
@@ -241,45 +231,17 @@ public class ReplyDao {
                     Long key = rs.getLong(1);
                     log.info("key : "+key);
                     newReply = findById(key);
-                    updatePostWithReply(postSeq, key);
                     postDao.addRevwCnt(postSeq);
                 }
 
                 return newReply;
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return Optional.empty();
-
             }
 
         }
-    }
-
-    public void updatePostWithReply(Long postSeq, Long replySeq){
-        String query = "INSERT INTO posts_replys (post_seq,reply_seq) VALUES(?,?);";
-
-
-        synchronized (ReplyDao.class) {
-
-            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-                log.info("update post with reply : " + this.conn);
-
-                this.pstmt = preparedStatement;
-                pstmt.setLong(1, postSeq);
-                pstmt.setLong(2, replySeq);
-
-                int result = pstmt.executeUpdate();
-
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public int updateContent(Long seq, String content) throws SQLException{
@@ -302,9 +264,7 @@ public class ReplyDao {
                 return result;
 
             } catch (Exception e) {
-
                 e.printStackTrace();
-
                 return -1;
 
             }
@@ -317,8 +277,6 @@ public class ReplyDao {
 
         synchronized (ReplyDao.class){
 
-        if(deleteRelation(seq) > 0) {
-
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);) {
                 log.info("reply delete conn : " + this.conn);
@@ -329,43 +287,11 @@ public class ReplyDao {
                 int result = pstmt.executeUpdate();
 
                 return result;
-
             } catch (Exception e) {
-
                 e.printStackTrace();
-
                 return -1;
 
             }
-        }
-        }
-
-        return -1;
-
-    }
-
-    public int deleteRelation(Long replySeq) throws SQLException{
-
-        String query = "DELETE FROM posts_replys WHERE reply_seq = (?)";
-
-        try(Connection connection = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            PreparedStatement preparedStatement= connection.prepareStatement(query);)
-        {
-            log.info("delete relation conn : " + this.conn);
-
-            this.pstmt = preparedStatement;
-            pstmt.setLong(1,replySeq);
-
-            int result = pstmt.executeUpdate();
-
-            return result;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return -1;
-
         }
     }
 }

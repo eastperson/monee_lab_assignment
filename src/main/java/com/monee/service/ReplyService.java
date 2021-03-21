@@ -59,16 +59,9 @@ public class ReplyService {
     }
 
     public boolean delete(Long seq) throws  SQLException{
-        deleteRelation(seq);
         int result = replyDao.delete(seq);
 
         return result > 0;
     }
-
-    public boolean deleteRelation(Long seq) throws SQLException {
-        return replyDao.deleteRelation(seq) > 0;
-    }
-
-
 
 }

@@ -81,7 +81,6 @@ public class AccountDao{
                 return Optional.of(account);
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return Optional.empty();
 
@@ -157,11 +156,9 @@ public class AccountDao{
                     log.info(String.valueOf(key));
                     newAccount = findById(key);
                 }
-
                 return newAccount;
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return Optional.empty();
 
@@ -187,13 +184,9 @@ public class AccountDao{
                 log.info("pass");
 
                 int result = pstmt.executeUpdate();
-
                 return result;
-
             } catch (Exception e) {
-
                 e.printStackTrace();
-
                 return -1;
 
             }
@@ -213,8 +206,6 @@ public class AccountDao{
                 this.pstmt = preparedStatement;
                 pstmt.setString(1, password);
                 pstmt.setLong(2, seq);
-
-                log.info("pass");
 
                 int result = pstmt.executeUpdate();
 
@@ -245,7 +236,6 @@ public class AccountDao{
                 log.info("email : " + email);
 
                 pstmt.setString(1, email);
-                log.info("pass");
 
                 rs = pstmt.executeQuery();
 

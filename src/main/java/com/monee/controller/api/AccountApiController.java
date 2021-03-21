@@ -75,6 +75,7 @@ public class AccountApiController {
             account = accountService.signup(dto);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+            log.error(throwables.getMessage());
         }
 
         log.info("account : " + account);
@@ -86,7 +87,6 @@ public class AccountApiController {
         result.setStatus(ResultApi.statusCode.BAD_REQUEST);
         int status = 400;
         boolean success = false;
-        //exchange.sendResponseHeaders(ResultApi.statusCode.BAD_REQUEST,result.toString().length());
 
         log.info("result : " + result);
 
@@ -120,9 +120,8 @@ public class AccountApiController {
         Map<String,String> map = gson.fromJson( payload.get("request").toString(), HashMap.class);
         log.info("map : "+map);
 
-        String email = map.get("email");
-        String password = map.get("password");
-
+        String email = (String) map.get("email");
+        String password = (String) map.get("password");
         log.info("password : "+ map.get(password));
 
         ObjectPool pool = ObjectPool.getInstance();

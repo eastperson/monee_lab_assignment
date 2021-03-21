@@ -18,30 +18,48 @@
 * 객체 라이프 사이클 관리 등을 위해 Spring 등의 서드파티 프레임워크 사용 불가
 * 단, 데이터 관리를 위한 구조체, 알고리즘 또는 저장소에 대한 서드파티 라이브러리는 자유롭게 사용
 
-<h2>개발 환경</h2>
 
-* 통신/서버 구축 : HttpServer, HttpHandler <br/>
-* DB 구축 : MySQL </br>
+
+<h3>개발 환경</h3>
+
+* 통신/서버 : HttpServer, HttpHandler <br/>
+* DB : MySQL </br>
 * DB Connection : 순수 JDBC <br/>
 * GraphQL : DataFetcher, graphqls schema <br/>
 * 인증/인가 : Filter, JWT, BCrypt <br/>
 * Test : JUnit5, HttpURLConnection, Postman, Apache JMeter <br/>
 
-<h2> 서비스 구현 </h2>
+<h3> 서비스 설계 </h3>
+
+
 Account - 회원가입, 로그인, 비밀번호 암호화, 계정 리스트, 계정 정보 (인증처리) <br/>
 Post - CRUD, 좋아요, 댓글 합계 (인증처리) <br/>
 Reply - CRUD (인증처리) <br/>
 
+[Service 소스 보기 (src\main\java\com\monee\service)](src\main\java\com\monee\service) <br/>
 <h3>ERD</h3>
+
+[DB Schema (src\main\resources\schema-mysql.sql)](src\main\resources\schema-mysql.sql) <br/>
+[Java Model 소스 보기 (src\main\java\com\monee\model)](src\main\java\com\monee\model)
+
 ![image](https://user-images.githubusercontent.com/66561524/111755024-fedc5500-88db-11eb-93d9-2da6f4f0a82f.png)
 <a href="https://aquerytool.com:443/aquerymain/index/?rurl=206bcb5e-ea1a-4a77-9599-43dbb58a08b4">ERD 확인(읽기 전용)</a></br>
 pw : 1jvwt8
 
+<h2>2. 프로젝트 구현</h2>
+
 <h3>MVC 패턴 구현</h3>
+
+[Controller 소스 보기 (src\main\java\com\monee\controller\annotation)](src\main\java\com\monee\controller) <br/>
+[Controller Annotation 소스 보기 (src\main\java\com\monee\controller\annotation)](src\main\java\com\monee\controller\annotation) <br/>
+[Service 소스 보기 (src\main\java\com\monee\service)](src\main\java\com\monee\service) <br/>
+[Object Pool 소스 보기 (src\main\java\com\monee\pool\ObjectPool.java)](src\main\java\com\monee\pool\ObjectPool.java)
+
 <p>
 Spring과 같이 MVC 패턴을 구현하기 위한 제작을 하였다. Spring Bean Container와 유사한 역할을 하는 ObjectPool을 만들었고, 컨트롤러의 경우는 코드의 복잡도가 높아져
 서버의 요청을 처리해주는 로직과 파라미터를 바인딩 받아 로직을 처리하는 로직을 어노테이션을 제작하여 분리하였다. 클라이언트 요청의 흐름은 다음과 같이 구현하였다.
 </p>
+
 <p>HtppServer를 통해 Client의 Request를 받는다. 요청의 Header와 RequestBody, URI를 읽고 Controller Pool에 있는 Controller Method와 맵핑을 한다. Controller는 
 어노테이션으로 등록된 컨트롤러와 메서드에 각 URI 마다 맵핑한다. 컨트롤러는 받은 요청의 파라미터를 바인딩해주고 Service가 처리된 로직의 결과값을 반환한다.
 Service는 로직처리를 해주며 로직처리가 된 값은 DAO를 통해 DB와 Connect한다. </p>
@@ -54,6 +72,7 @@ Controller를 제외한 모든 객체는 서버가 시작될 때 ObjectPool에�
 
 <h3>DB Connection</h3>
 
+[DAO 소스 보기 (src\main\java\com\monee\dao)](src\main\java\com\monee\dao)
 <p>
 순수 JDBC를 사용하여 DB Connection을 생성한다. 쿼리는 용도에 따라 정적으로 구현을 하였다. 커넥션을 사용하는 로직은 동기화 처리가 되어있어 멀티 쓰레드 환경에서 생기는
 오류를 방지하였다. 
@@ -72,47 +91,95 @@ schema의 쿼리/뮤테이션마다 하나씩 작성하며 해당하는 데이�
 활용할 수 있도록  구성하였다. API의 엔드포인트에 따른 필요 Parameter와 기대 응답은 최하단에 기재하였다.
 </p>
 
+[GraphQL Schema (src\main\resources\graphql\schema.graphqls)](src\main\resources\graphql\schema.graphqls)
+[GraphQL Provider, DataFetcher 소스 보기 (src\main\java\com\monee\graphql)](src\main\java\com\monee\graphql)
+
 <h3>인증/인가</h3>
+
+[Filter 소스 보기 (src\main\java\com\monee\Filter\LoginFilter.java)](src\main\java\com\monee\Filter\LoginFilter.java)
+[JWT 소스 보기 (src\main\java\com\monee\security\Jwt.java)](src\main\java\com\monee\security\Jwt.java)
+
 <p>
 API 로직에 적합한 Jwt를 사용하여 로그인처리를 구현하였다. 로그인 처리가 완료되면 access_token이 발급된다. JWT 검증은 Controller 맵핑을 하기 전인 Filter를 통해 구현하였다.
 로그인과 회원가입을 제외한 요청들은 Request Header에 있는 Authorization을 확인하여 JWT 클레임에 있는 회원정보와 토큰 만료기간을 확인한다. 토큰이 만료가 되어있으면
 405 Error를 Response하여 로그인을 재요청한다. JWT 토큰의 회원정보와 Client Key가 DB와 일치하지 않으면 역시 405 에러가 발생한다.
 로그아웃은 해당하는 토큰을 제거하는 로직을 구현해야 하기 때문에 토큰을 저장하고 삭제할 수 있는 Client의 역할로 설계하였다.
 </p>
-
-<h3>테스트 환경</h3>
 <p>
-GraphQL로 제작한 Api Controller를 테스트하기 위해 Postman과 HttpURLConnection을 사용했다. 서버를 구동시켜 Postman으로 
-쿼리를 테스트하였다. 또한 Application을 Thread로 생성하여 HttpURLConnection으로 JUnit 테스트 환경에서 요청과 응답을 확인하였다.
+보안을 위해 비밀번호는 회원가입시 암호화된다. 암호화는 BCrypt를 활용하여 단방향의 Hash 방식으로 등록을 하고, 저장된 암호를 비밀번호와 비교해서
+일치하는 경우 로그인 처리를 완료하며 JWT을 발급한다. JWT 만료 기한은 7시간으로 설정하였다.
 </p>
 
-<p>
+``` java
+if(accountService.login(email,password)){
+    log.info("login success");
+    Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+    Jwt jwt = new Jwt("issuer","clientSecret",60*60*7);
+    String accessToken = account.newJwt(jwt);
+    result.setData(new LoginResult(accessToken,account));
+    result.setSuccess(true);
+    result.setStatus(ResultApi.statusCode.OK);
+    log.info(String.valueOf(result));
+    status = 200;
+    success = true;
+}
 
+public Boolean login(String email, String password) throws NotFoundException {
+        Account account = findByEmail(email)
+            .orElseThrow(() -> new NotFoundException("Could not found user for " + email));
+        return BCrypt.checkpw(password,account.getPassword());
+}
+            
+``` 
+
+
+<h2>3. 테스트 환경</h2>
+
+<h3>HttpURLConnection 테스트 <small><br/>
+
+[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](src\test\java\com\monee\controller\AccountControllerTest.java)</small></h3>
+
+<p>
+JUnit 환경에 API 서비스를 테스트하기 위해 HttpURLConnection을 통해 가상의 클라이언트를 생성해서 진행했다. JUnit5 환경에서 connection에 Header와 Request Body를 입력한다.
+요청에 따라 Authorization를 입력한다. 이후 커넥트를 통해 Response Body를 응답받고, 받은 내용을 JSON으로 파싱한다. status code와 success 여부를 판단하여
+요청과 응답의 정합성을 판단한다.
+
+테스트 실행 중에는 서버가 구동이 되어야 하기 때문에 서버 메인 애플리케이션을 @BeforeAll를 통해 멀티쓰레드로 실행시킨다. 실행 후에는 나머지 테스트 코드를 실행시켜
+API 서비스를 테스트한다.
 </p>
 
-<table>
-    <thead>
-        <tr>
-            <th>환경</th>
-            <th>기술</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Server</td>
-            <td>Tomcat 9.0</td>
-        </tr>
-        <tr>
-            <td>DB</td>
-            <td>Maria DB</td>
-        </tr>
-        <tr>
-            <td>IDE</td>
-            <td>Intellij Ultimate</td>
-        </tr>
-    </tbody>
-</table>
+<h3>Postman 테스트</h3>
 
+<p>
+클라이언트 환경에서 API 서비스를 테스트하기위해 Postman을 사용하였다. <br/>
+<a href="https://www.getpostman.com/collections/7f55c97ddb48f6e3d85a">포스트맨 쿼리 보기</a>
+</p>
+
+<h3>Thread-Safety 테스트</h3>
+
+[전체 서비스 쓰레드 안정성 테스트 소스 보기 (src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)](src/test/java/com/monee/thread/AllServiceThreadSafetyTest.java)<br/>
+멀티 쓰레드 환경에서 Service가 동작하는지 확인하기 위해 쓰레드 코드를 작성해서 실행하였다. [ThreadException](src/main/java/com/monee/errors/ThreadException.java)이 발생하는 경우
+Connection 오류가 발생하는 것을 확인하였고, synchronized 블럭을 사용하여 단일 커넥션을 사용하는 경우 동기화 처리를 진행시켜주었다.
+
+HttpServer는 기본적으로 ThreadPool에서 쓰레드 사용해주기 때문에 다중의 클라이언트의 접근을 인스턴스를 통해 접근할 수 있다.
+
+
+```java
+server.setExecutor(Executors.newCachedThreadPool());
+```
+<p>
+JUnit 환경에서는 멀티 쓰레드 API 테스트가 쉽지 않았기 때문에 JMeter에서 진행을 하였다.
+</p>
+
+
+<h3>JMeter 테스트</h3>
+
+[JMeter 결과 Summary](src\main\resources\jmeter_summary.csv) <br/>
+Multi-Thread와 Stress를 검증하기 위해 JMeter를 사용하였다. 100개의 쓰레드 * 20번의 loop의 환경에서 API 서비스 테스트 및 성능 테스트를 하였다. 
+
+![image](https://user-images.githubusercontent.com/66561524/111894553-fa847900-8a4e-11eb-9e0c-6911675c6fb3.png)
+
+<hr>
 <h2>계정 API</h2>
 <h3>▶️ Request</h3>
 
@@ -264,7 +331,7 @@ Authorization: Bearer {ACCESS_TOKEN}
 
 **Request**
 
-```json
+```
 curl -X POST "http://localhost:8080/account" 
      -d '{"query" : "{allAccounts{success,status,data{seq,email,nickname}}}"}'
      -H "Authorization: Bearer {ACCESS_TOKEN}"
@@ -272,7 +339,7 @@ curl -X POST "http://localhost:8080/account"
 
 **Response**
 
-```json
+```
 {
   Account={
       success=true,
@@ -286,11 +353,167 @@ curl -X POST "http://localhost:8080/account"
 }
 ```
 
+<h2>로그인 API</h2>
+<h3>▶️ Request</h3>
+
+```
+POST /account/login HTTP/1.1
+Host: localhost:8080
+```
+
+<h3>Query</h3>
+<table>
+	<thead>
+		<tr>
+			<th>Query Name</th>
+            <th>Parameter Name</th>
+			<th>Parameter</th>
+			<th>Description</th>
+			<th>Required</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td rowspan="3">Account</td>
+			<td><code>email</code></td>
+			<td><code>String</code></td>
+			<td>로그인 아이디</td>
+            <td>O</td>
+		</tr>
+		<tr>
+			<td><code>password</code></td>
+			<td><code>String</code></td>
+			<td>로그인 비밀번호</td>
+            <td>O</td>
+		</tr>
+        <tr>
+        <td colspan="5"><code>{"request":{"password":"\"123123\"","email":"kjuioqqq@naver.com"}}</code></td>
+        </tr>
+	</tbody>
+</table>
+
+<h3>▶️ Response</h3>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Description</th>
+			<th>Required</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>success</td>
+			<td><code>boolean</code></td>
+			<td>요청이 성공 여부</td>
+			<td>O</td>
+		</tr>
+	</tbody>
+	<tbody>
+		<tr>
+			<td>status</td>
+			<td><code>int</code></td>
+			<td>응답 상태 코드</td>
+			<td>O</td>
+		</tr>
+	</tbody>
+	<tbody>
+		<tr>
+			<td>data</td>
+			<td><code>Account</code></td>
+			<td>계정 정보</td>
+			<td>X</td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>회원가입 API</h2>
+<h3>▶️ Request</h3>
+
+```
+POST /account/signup HTTP/1.1
+Host: localhost:8080
+```
+
+<h3>Query</h3>
+<table>
+	<thead>
+		<tr>
+			<th>Query Name</th>
+            <th>Parameter Name</th>
+			<th>Parameter</th>
+			<th>Description</th>
+			<th>Required</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td rowspan="4">Account</td>
+			<td><code>email</code></td>
+			<td><code>String</code></td>
+			<td>이메일</td>
+            <td>O</td>
+		</tr>
+		<tr>
+			<td><code>nickname</code></td>
+			<td><code>String</code></td>
+			<td>닉네임</td>
+            <td>O</td>
+		</tr>
+		<tr>
+			<td><code>password</code></td>
+			<td><code>String</code></td>
+			<td>비밀번호</td>
+            <td>O</td>
+		</tr>
+        <tr>
+        <td colspan="5"><code>{"request":{"password":"123123","nickname":"eastperson","email":"fc4eadb9-e@naver.com"}}</code></td>
+        </tr>
+	</tbody>
+</table>
+
+<h3>▶️ Response</h3>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Description</th>
+			<th>Required</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>success</td>
+			<td><code>boolean</code></td>
+			<td>요청이 성공 여부</td>
+			<td>O</td>
+		</tr>
+	</tbody>
+	<tbody>
+		<tr>
+			<td>status</td>
+			<td><code>int</code></td>
+			<td>응답 상태 코드</td>
+			<td>O</td>
+		</tr>
+	</tbody>
+	<tbody>
+		<tr>
+			<td>data</td>
+			<td><code>Account</code></td>
+			<td>계정 정보</td>
+			<td>X</td>
+		</tr>
+	</tbody>
+</table>
+
 <h2>게시글 API</h2>
 <h3>▶️ Request</h3>
 
 ```
-POST /post HTTP/1.1
+POST /api/post HTTP/1.1
 Host: localhost:8080
 Authorization: Bearer {ACCESS_TOKEN}
 ```
@@ -455,7 +678,7 @@ Authorization: Bearer {ACCESS_TOKEN}
 		<tr>
 			<td>data</td>
 			<td><code>Post</code></td>
-			<td>계정 정보</td>
+			<td>게시글 정보</td>
 			<td>X</td>
 		</tr>
 	</tbody>
@@ -466,15 +689,15 @@ Authorization: Bearer {ACCESS_TOKEN}
 
 **Request**
 
-```json
-curl -X POST "http://localhost:8080/post" 
+```
+curl -X POST "http://localhost:8080/api/post" 
      -d '{"query": "{Post(seq:1){success,status,data{seq,title,content,revwCnt}}}"}'
      -H "Authorization: Bearer {ACCESS_TOKEN}"
 ```
 
 **Response**
 
-```json
+```
 {
   Post={
       success=true, 
@@ -493,7 +716,7 @@ curl -X POST "http://localhost:8080/post"
 <h3>▶️ Request</h3>
 
 ```
-POST /reply HTTP/1.1
+POST /api/reply HTTP/1.1
 Host: localhost:8080
 Authorization: Bearer {ACCESS_TOKEN}
 ```
@@ -633,7 +856,7 @@ Authorization: Bearer {ACCESS_TOKEN}
 		<tr>
 			<td>data</td>
 			<td><code>Reply</code></td>
-			<td>계정 정보</td>
+			<td>댓글 정보</td>
 			<td>X</td>
 		</tr>
 	</tbody>
@@ -644,15 +867,15 @@ Authorization: Bearer {ACCESS_TOKEN}
 
 **Request**
 
-```json
-curl -X POST "http://localhost:8080/reply" 
+```
+curl -X POST "http://localhost:8080/api/reply" 
      -d '{"query": "{Reply(seq:1){success,status,data{seq,content,author{seq,email,nickname,password}}}}"}'
      -H "Authorization: Bearer {ACCESS_TOKEN}"
 ```
 
 **Response**
 
-```json
+```
 {
   Reply={
           success=true, 

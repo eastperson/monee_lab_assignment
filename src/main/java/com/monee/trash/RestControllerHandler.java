@@ -72,8 +72,6 @@ public class RestControllerHandler implements HttpHandler  {
 
         if("POST".equals(exchange.getRequestMethod())){
 
-            log.info("===============================");
-
             Headers responseHeaders = exchange.getResponseHeaders();
 
             responseHeaders.set("Content-Type", "application/json");
@@ -106,7 +104,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    log.info("=======================================json reqeust");
+                    log.info("json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -129,10 +127,6 @@ public class RestControllerHandler implements HttpHandler  {
 
                     ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
                     log.info("execute : "+execute.getData().toString());
-
-                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
-
-                    //Account account = accountService.signup(dto);
 
                     respText = gson.toJson(execute.getData().toString());
 
@@ -146,7 +140,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    log.info("=======================================json reqeust");
+                    log.info("json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -169,10 +163,6 @@ public class RestControllerHandler implements HttpHandler  {
 
                     ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
                     log.info("execute : "+execute.getData().toString());
-
-                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
-
-                    //Account account = accountService.signup(dto);
 
                     respText = gson.toJson(execute.getData().toString());
 
@@ -186,7 +176,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    log.info("=======================================json reqeust");
+                    log.info("json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -210,10 +200,6 @@ public class RestControllerHandler implements HttpHandler  {
                     ExecutionResult execute = accountServiceGraphQLProvider.execute(query);
                     log.info("execute : "+execute.getData().toString());
 
-                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
-
-                    //Account account = accountService.signup(dto);
-
                     respText = gson.toJson(execute.getData().toString());
 
                 }
@@ -226,8 +212,8 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    log.info("=======================================json reqeust");
-                    log.info("========================api login");
+                    log.info("json reqeust");
+                    log.info("api login");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -251,7 +237,6 @@ public class RestControllerHandler implements HttpHandler  {
                     result.setSuccess(false);
                     result.setStatus(ResultApi.statusCode.BAD_REQUEST);
                     status = 400;
-                    //exchange.sendResponseHeaders(400,result.toString().length());
 
                     log.info("email : "+email);
                     log.info("password : " + password);
@@ -268,15 +253,10 @@ public class RestControllerHandler implements HttpHandler  {
                             result.setStatus(ResultApi.statusCode.OK);
                             log.info(String.valueOf(result));
                             status = 200;
-                            //exchange.sendResponseHeaders(ResultApi.statusCode.OK,result.toString().length());
                         }
                     } catch (NotFoundException e) {
                         e.printStackTrace();
                     }
-
-                    //AccountDto dto = gson.fromJson(str, AccountDto.class);
-
-                    //Account account = accountService.signup(dto);
 
                     respText = gson.toJson(result.toString());
 
@@ -290,7 +270,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if (exchange.getRequestHeaders().get("Content-type").contains("application/json")){
 
-                    log.info("=======================================json reqeust");
+                    log.info("json reqeust");
 
                     String str = "";
                     str += br.readLine().trim();
@@ -299,10 +279,9 @@ public class RestControllerHandler implements HttpHandler  {
                         try {
                             str += br.readLine().trim();
                         } catch (Exception e) {
-                            log.info(e.getMessage());
+                            log.error(e.getMessage());
                             str += "}";
                         }
-
                         log.info(str);
                     }
 
@@ -351,7 +330,7 @@ public class RestControllerHandler implements HttpHandler  {
 
                 if(exchange.getRequestHeaders().get("Content-type").contains("application/x-www-form-urlencoded")){
 
-                    log.info("=======================================form reqeust");
+                    log.info("form reqeust");
 
                     String str = "";
 

@@ -1,6 +1,8 @@
 package com.monee.graphql;
 
+import com.monee.model.Reply;
 import com.monee.pool.ObjectPool;
+import com.monee.service.ReplyService;
 import graphql.ExecutionResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 public class ReplyGraphqlTest {
 
@@ -80,10 +84,14 @@ public class ReplyGraphqlTest {
 
     @DisplayName("delete reply 댓글 테스트")
     @Test
-    void reply_delete() throws IOException {
+    void reply_delete() throws IOException, SQLException {
         ServiceGraphQLProvider accountServiceGraphQLProvider = getAccountServiceGraphQLProvider();
 
-        String query = "mutation{deleteReply(seq:30){success,status,data{seq,content,author{seq,email,nickname}}}}";
+        ReplyService replyService = ObjectPool.getInstance().getReplyService();
+        List<Reply> list = replyService.findAll();
+        Reply reply = list.get(list.size()-1);
+
+        String query = "mutation{deleteReply(seq:"+reply.getSeq()+"){success,status,data{seq,content,author{seq,email,nickname}}}}";
 
         log.info(query);
 

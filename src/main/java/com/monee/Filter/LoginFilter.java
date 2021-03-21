@@ -31,58 +31,54 @@ public class LoginFilter extends Filter {
 
         if(uri.getPath().equals("/filter/test") || uri.getPath().equals("/api/account") || uri.getPath().equals("/api/post") || uri.getPath().equals("/api/reply")){
 
-            String token = null;
-            try{
-                token = exchange.getRequestHeaders().get("Authorization").get(0);
-                log.info("Bearer with token : " + token);
-                token = token.split(" ")[1];
-                log.info("token : " + token);
-
-                String clientSecret = "clientSecret";
-                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(clientSecret))
-                        .withIssuer("issuer")
-                        .build();
-                Jwt.Claims claims = new Jwt.Claims(jwtVerifier.verify(token));
-                String email = claims.getEmail();
-                String password = claims.getPassword();
-                log.info("filter email : " + email);
-                log.info("filter password : " + password);
-
-                AccountDao accountDao = new AccountDao();
-                AccountService accountService = new AccountService(accountDao);
-
+                String token = null;
                 try{
-                    Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
+                    token = exchange.getRequestHeaders().get("Authorization").get(0);
+                    log.info("Bearer with token : " + token);
+                    token = token.split(" ")[1];
+                    log.info("token : " + token);
 
+                    String clientSecret = "clientSecret";
+                    JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(clientSecret))
+                            .withIssuer("issuer")
+                            .build();
+                    Jwt.Claims claims = new Jwt.Claims(jwtVerifier.verify(token));
+                    String email = claims.getEmail();
+                    String password = claims.getPassword();
+                    log.info("filter email : " + email);
+                    log.info("filter password : " + password);
 
-                    log.info("account : "+account);
+                    AccountDao accountDao = new AccountDao();
+                    AccountService accountService = new AccountService(accountDao);
 
-                    //exchange.getRequestHeaders().add("user",account.getEmail());
+                    try{
+                        Account account = accountService.findByEmail(email).orElseThrow(NullPointerException::new);
 
-                } catch (NullPointerException ne) {
-                    ne.printStackTrace();
-                    log.error("not found account");
+                        log.info("account : "+account);
+
+                        //exchange.getRequestHeaders().add("user",account.getEmail());
+
+                    } catch (NullPointerException ne) {
+                        ne.printStackTrace();
+                        log.error("not found account");
+                    }
+                } catch (NullPointerException e) {
+                    log.info("authorization null");
+                    String newUrl = "http://localhost:8080/";
+                    status = 405;
+                    exchange.getResponseHeaders().add("Location", newUrl);
+                    length = respText.getBytes().length;
+                    exchange.getResponseHeaders().set("Content-Type", "application/json");
+
+                    exchange.sendResponseHeaders(status, length);
+                    OutputStream output = exchange.getResponseBody();
+
+                    output.write(respText.getBytes());
+                    output.flush();
+                    exchange.close();
                 }
-
-            } catch (NullPointerException e) {
-                log.info("authorization null");
-                String newUrl = "http://localhost:8080/";
-                status = 405;
-                exchange.getResponseHeaders().add("Location", newUrl);
-                length = respText.getBytes().length;
-                exchange.getResponseHeaders().set("Content-Type", "application/json");
-
-                exchange.sendResponseHeaders(status, length);
-                OutputStream output = exchange.getResponseBody();
-
-                output.write(respText.getBytes());
-                output.flush();
-                exchange.close();
-            }
-
             } else {
                 log.info("login pass..................");
-
             }
         chain.doFilter(exchange);
     }

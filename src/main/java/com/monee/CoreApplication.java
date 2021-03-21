@@ -18,13 +18,14 @@ import static java.lang.Thread.sleep;
 public class CoreApplication implements Runnable {
     private static Logger log = LoggerFactory.getLogger(CoreApplication.class);
 
+    private static int serverPort = 8080;
+    private int tmp;
+
     public static void main(String[] args) throws IOException, NoSuchMethodException {
-        log.info("===================================");
         serverStart();
     }
 
     private static void serverStart() throws IOException {
-        int serverPort = 8080;
 
         HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
 

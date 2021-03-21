@@ -79,7 +79,6 @@ public class LikeDao {
                 return rs == 1;
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return false;
             }
@@ -106,11 +105,9 @@ public class LikeDao {
                 if(!rs.next()){
                     return false;
                 }
-
                 return rs.getString("account_seq") != null && rs.getString("post_seq") != null;
 
             } catch (Exception e) {
-
                 e.printStackTrace();
                 return false;
             }

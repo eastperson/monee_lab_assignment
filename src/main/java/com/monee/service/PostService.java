@@ -73,7 +73,6 @@ public class PostService {
 
     public boolean delete(Long seq) throws  SQLException{
         deleteLikes(seq);
-        deleteRelation(seq);
         deleteReplys(seq);
         int result = postDao.delete(seq);
 
@@ -101,8 +100,4 @@ public class PostService {
 
         return result > 0;
     }
-    public boolean deleteRelation(Long postSeq) throws SQLException {
-        return postDao.deleteRelation(postSeq) > 0;
-    }
-
 }

@@ -49,7 +49,7 @@ public class ReplyControllerTest {
     @Test
     void graphql_reply_correct() throws IOException {
 
-        String query = "{\"query\": \"{Reply(seq:1){success,status,data{seq,content,author{seq,email,nickname,password}}}}\"}";
+        String query = "{\"query\": \"{Reply(seq:6902){success,status,data{seq,content,author{seq,email,nickname,password}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/reply");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -111,7 +111,7 @@ public class ReplyControllerTest {
     @Test
     void graphql_findByPostId_correct() throws IOException {
 
-        String query = "{\"query\": \"{allReplys(post_seq:\\\"1\\\"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
+        String query = "{\"query\": \"{allReplys(post_seq:\\\"1725\\\"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/reply");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -142,7 +142,7 @@ public class ReplyControllerTest {
     @Test
     void graphql_create_correct() throws IOException {
 
-        String query = "{\"query\": \"mutation{createReply(author_seq:\\\"1\\\",post_seq:\\\"1\\\",content:\\\"댓글 내용\\\"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
+        String query = "{\"query\": \"mutation{createReply(author_seq:\\\"1\\\",post_seq:\\\"1720\\\",content:\\\"댓글 내용\\\"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/reply");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -173,7 +173,7 @@ public class ReplyControllerTest {
     @Test
     void graphql_updateContent_correct() throws IOException {
 
-        String query = "{\"query\": \"mutation{updateReply(seq:1,content:\\\"댓글 수정\\\"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
+        String query = "{\"query\": \"mutation{updateReply(seq:6902,content:\\\"댓글 수정\\\"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}";
 
         URL url = new URL("http://localhost:8080/api/reply");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();

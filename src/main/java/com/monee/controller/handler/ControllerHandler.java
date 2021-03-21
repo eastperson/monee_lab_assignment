@@ -61,7 +61,7 @@ public class ControllerHandler {
 
     private static boolean checkIsMappingAble(HttpExchange exchange,Object controller) {
 
-        log.info("check is mapping uri====");
+        log.info("check is mapping uri");
 
         URI uri = exchange.getRequestURI();
         String requestMethod = exchange.getRequestMethod();

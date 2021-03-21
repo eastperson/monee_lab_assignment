@@ -1,6 +1,8 @@
 package com.monee.graphql;
 
+import com.monee.model.Post;
 import com.monee.pool.ObjectPool;
+import com.monee.service.PostService;
 import graphql.ExecutionResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 public class PostGraphqlTest {
 
@@ -127,10 +131,15 @@ public class PostGraphqlTest {
 
     @DisplayName("delete post 테스트")
     @Test
-    void delete_post() throws IOException {
+    void delete_post() throws IOException, SQLException {
+
+        PostService postService = ObjectPool.getInstance().getPostService();
+        List<Post> list = postService.findAll();
+        Post post = list.get(list.size()-1);
+
         ServiceGraphQLProvider accountServiceGraphQLProvider = getAccountServiceGraphQLProvider();
 
-        String query = "mutation {deletePost(seq:7){success,status,data{seq,title,content,revwCnt}}}";
+        String query = "mutation {deletePost(seq:"+post.getSeq()+"){success,status,data{seq,title,content,revwCnt}}}";
         //String query = "query{allPosts{seq,title,content,revwCnt}}";
 
         log.info(query);

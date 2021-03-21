@@ -47,6 +47,7 @@ public class AccountControllerTest {
         HttpServer server = HttpServer.create(new InetSocketAddress(8001), 0);
 
         Runnable coreApplication = new CoreApplication();
+
         Thread serverThread = new Thread(coreApplication);
         serverThread.start();
         log.info("server thread start");

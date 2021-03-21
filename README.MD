@@ -36,7 +36,7 @@ Account - 회원가입, 로그인, 비밀번호 암호화, 계정 리스트, 계
 Post - CRUD, 좋아요, 댓글 합계 (인증처리) <br/>
 Reply - CRUD (인증처리) <br/>
 
-[Service 소스 보기 (src\main\java\com\monee\service)](https://github.com/eastperson/monee_lab_assignment/tree/master/srcmain/java/com/monee/service) <br/>
+[Service 소스 보기 (src\main\java\com\monee\service)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/service) <br/>
 <h3>ERD</h3>
 
 [DB Schema (src\main\resources\schema-mysql.sql)](src\main\resources\schema-mysql.sql) <br/>

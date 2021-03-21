@@ -89,7 +89,7 @@ schema의 쿼리/뮤테이션마다 하나씩 작성하며 해당하는 데이�
 </p>
 
 
-응답은 success, status code, object를 필드로 갖는 [ResultApi](src\main\java\com\monee\utils\ResultApi.java) 객체를 만들어서 반환한다. 응답 내용은 쉽게 Client에서 확인할 수 있으며 응답 data 객체에 따라 유연하게 활용할 수 있도록 구성하였다. API의 엔드포인트에 따른 필요 Parameter와 기대 응답은 최하단에 기재하였다.
+응답은 success, status code, object를 필드로 갖는 [ResultApi](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/utils/ResultApi.java) 객체를 만들어서 반환한다. 응답 내용은 쉽게 Client에서 확인할 수 있으며 응답 data 객체에 따라 유연하게 활용할 수 있도록 구성하였다. API의 엔드포인트에 따른 필요 Parameter와 기대 응답은 최하단에 기재하였다.
 
 
 <h3>인증/인가</h3>

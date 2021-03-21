@@ -621,6 +621,9 @@ Authorization: Bearer {ACCESS_TOKEN}
             <td>O</td>
 		</tr>
 		<tr>
+			<td colspan="5">{\"query\": \"mutation {deletePost(seq:"+post.getSeq()+"){success,status,data{seq,title,content,revwCnt}}}\"}</td>
+		</tr>
+		<tr>
             <td rowspan="4">addLikePost</td>
 			<td>account_seq</td>
 			<td><code>Long</code></td>
@@ -815,7 +818,10 @@ Authorization: Bearer {ACCESS_TOKEN}
 			<td>seq</td>
 			<td><code>Long</code></td>
 			<td>삭제할 Reply 시퀀스</td>
-            <td>O</td>
+			<td>O</td>
+		</tr>
+		<tr>
+			<td colspan="5">{\"query\": \"mutation {deletePost(seq:"+post.getSeq()+"){success,status,data{seq,title,content,revwCnt}}}\"}</td>
 		</tr>
         <tr>
             <td colspan="4"><code>{\"query\": \"mutation{deleteReply(seq:"+reply.getSeq()+"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}</code></td>

@@ -818,11 +818,8 @@ Authorization: Bearer {ACCESS_TOKEN}
 			<td>O</td>
 		</tr>
 		<tr>
-			<td colspan="5">{\"query\": \"mutation {deletePost(seq:"+post.getSeq()+"){success,status,data{seq,title,content,revwCnt}}}\"}</td>
+			<td colspan="5"><code>{\"query\": \"mutation {deletePost(seq:"+post.getSeq()+"){success,status,data{seq,title,content,revwCnt}}}\"}</code></td>
 		</tr>
-        <tr>
-            <td colspan="4"><code>{\"query\": \"mutation{deleteReply(seq:"+reply.getSeq()+"){success,status,data{seq,content,author{seq,email,nickname}}}}\"}</code></td>
-        </tr>
 	</tbody>
 </table>
 

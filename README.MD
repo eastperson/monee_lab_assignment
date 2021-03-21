@@ -56,11 +56,11 @@ pw : 1jvwt8
 [Object Pool 소스 보기 (src\main\java\com\monee\pool\ObjectPool.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/pool/ObjectPool.java)
 
 <p>
-Spring과 같이 MVC 패턴을 구현하기 위한 제작을 하였다. Spring Bean Container와 유사한 역할을 하는 ObjectPool을 만들었다. Controller의 경우는 코드의 복잡도가 높아져
-서버의 요청을 처리해주는 로직과 파라미터를 바인딩 받아 로직을 처리하는 로직을 어노테이션을 제작하여 분리하였다. 클라이언트 요청의 흐름은 아래와 같이 구현하였다.
+Spring과 같이 MVC 패턴을 하기 위해 노력했다. Spring Bean Container와 유사하게 객체를 생성하여 싱글톤으로 사용하는 ObjectPool을 구현했다. Controller는
+서버의 요청을 처리해주는 로직과 파라미터를 바인딩 받아 로직을 처리하는 로직을 커스텀 어노테이션으로 분리하였다. 클라이언트의 요청과 응답 흐름은 아래와 같이 구현하였다.
 </p>
 
-<p>HtppServer를 통해 Client의 Request를 받는다. 요청의 Header와 RequestBody, URI를 읽어 Controller Pool에 있는 Controller Method와 맵핑을 한다. Controller는 
+<p>서버는 HtppServer를 통해 Client의 Request를 받는다. 요청의 Header와 RequestBody, URI를 읽어 Controller Pool에 있는 Controller Method와 맵핑을 한다. Controller는 
 어노테이션으로 등록된 컨트롤러와 메서드 어노테이션에 기재되어있는 URI에 맵핑한다. 컨트롤러는 받은 요청의 파라미터를 바인딩해주고 Service가 처리된 로직의 결과값을 반환한다.
 Service는 로직처리를 해주며 로직처리가 된 값은 DAO를 통해 DB와 Connect한다. </p>
 <p>
@@ -98,13 +98,13 @@ schema의 쿼리/뮤테이션마다 하나씩 작성하며 해당하는 데이�
 [JWT 소스 보기 (src\main\java\com\monee\security\Jwt.java)](https://github.com/eastperson/monee_lab_assignment/tree/master/src/main/java/com/monee/security/Jwt.java)
 
 <p>
-API 로직에 적합한 Jwt를 사용하여 로그인처리를 구현하였다. 로그인 처리가 완료되면 access_token이 발급된다. JWT 검증은 Controller 맵핑을 하기 전인 Filter를 통해 구현하였다.
+API 서비스 인증 로직에 적합한 JWT를 사용하여 로그인처리를 구현하였다. JWT는 로그인 처리가 완료되면 access_token이 발급한다. access_token은 사용자 정보를 포함하여 인증 역할을 담당한다. JWT 검증은 Filter를 통해 Controller URI 맵핑 이전에 진행된다.
 로그인과 회원가입을 제외한 요청들은 Request Header에 있는 Authorization을 확인하여 JWT 클레임에 있는 회원정보와 토큰 만료기간을 확인한다. 토큰이 만료가 되어있으면
 405 Error를 Response하여 로그인을 재요청한다. JWT 토큰의 회원정보와 Client Key가 DB와 일치하지 않으면 역시 405 에러가 발생한다.
-로그아웃은 해당하는 토큰을 제거하는 로직을 구현해야 하기 때문에 토큰을 저장하고 삭제할 수 있는 Client의 역할로 설계하였다.
+로그아웃은 해당하는 토큰을 제거하는 로직을 구현해야 하기 때문에 토큰을 저장하고 삭제할 수 있는 Client의 역할로 위임한다.
 </p>
 <p>
-보안을 위해 비밀번호는 회원가입시 암호화된다. 암호화는 BCrypt를 활용하여 단방향의 Hash 방식으로 등록을 하고, 저장된 암호를 비밀번호와 비교해서
+보안을 위해 비밀번호는 회원가입시 암호화된다. 암호화는 BCrypt를 활용하여 단방향 Hash 방식으로 등록을 하고, 저장된 암호를 비밀번호와 비교해서
 일치하는 경우 로그인 처리를 완료하며 JWT을 발급한다. JWT 만료 기한은 7시간으로 설정하였다.
 </p>
 

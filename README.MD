@@ -135,9 +135,9 @@ public Boolean login(String email, String password) throws NotFoundException {
 
 <h2>3. 테스트 환경</h2>
 
-<h3>HttpURLConnection 테스트 <small><br/>
+<h3>HttpURLConnection 테스트</h3>
 
-[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](src\test\java\com\monee\controller\AccountControllerTest.java)</small></h3>
+[테스트 코드 확인 (src\test\java\com\monee\controller\AccountControllerTest.java)](src\test\java\com\monee\controller\AccountControllerTest.java)
 
 <p>
 JUnit 환경에 API 서비스를 테스트하기 위해 HttpURLConnection을 통해 가상의 클라이언트를 생성해서 진행했다. JUnit5 환경에서 connection에 Header와 Request Body를 입력한다.

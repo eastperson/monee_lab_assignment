@@ -614,7 +614,7 @@ Authorization: Bearer {ACCESS_TOKEN}
             <td colspan="5"><code>{"query": "mutation {updatePost(seq:1,title:\"제목 수정\"){success,status,data{seq,title,content}}}"}</code></td>
         </tr>
 		<tr>
-            <td>deletePost</td>
+            <td rowspan="2">deletePost</td>
 			<td>seq</td>
 			<td><code>Long</code></td>
 			<td>삭제할 Post 시퀀스</td>
@@ -752,9 +752,6 @@ Authorization: Bearer {ACCESS_TOKEN}
 			<td>검색할 Reply List의 시퀀스</td>
             <td>O</td>
 		</tr>
-        <tr>
-            <td colspan="5"><code>{"query": "{allPosts{success,status,data{seq,title,content,revwCnt,author{seq,nickname,email}}}}"}</code></td>
-        </tr>
 	</tbody>
 </table>
 <h3>Mutation</h3>
